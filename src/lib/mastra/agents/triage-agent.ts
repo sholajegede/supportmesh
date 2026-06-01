@@ -1,5 +1,5 @@
 import { Agent } from "@mastra/core/agent";
-import { openai } from "@ai-sdk/openai";
+import { anthropic } from "@ai-sdk/anthropic";
 import { searchKnowledgeTool } from "../tools/knowledge";
 import { checkEscalationTool } from "../tools/escalate";
 import { saveTriageResultTool } from "../tools/classify";
@@ -7,7 +7,7 @@ import { saveTriageResultTool } from "../tools/classify";
 export const triageAgent = new Agent({
   id: "triage-agent",
   name: "triage-agent",
-  model: openai("gpt-4o-mini"),
+  model: anthropic("claude-haiku-4-5"),
   tools: {
     searchKnowledge: searchKnowledgeTool,
     checkEscalation: checkEscalationTool,
