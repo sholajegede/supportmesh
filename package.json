@@ -9,9 +9,16 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.67",
+    "@kinde-oss/kinde-auth-nextjs": "^2.12.2",
+    "@mastra/core": "^1.37.1",
+    "@mastra/memory": "^1.20.0",
+    "@TODO-scope/auth-kinde": "github:sholajegede/mastra-auth-kinde",
+    "ai": "^6.0.193",
     "next": "16.2.7",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
