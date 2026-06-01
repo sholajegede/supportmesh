@@ -37,4 +37,11 @@ export default defineSchema({
     avgSentiment: v.string(),
     longRunningTickets: v.array(v.string()),
   }).index("by_orgCode", ["orgCode"]),
+
+  users: defineTable({
+    kindeId: v.string(),
+    email: v.string(),
+    firstName: v.string(),
+    lastName: v.string(),
+  }).index("by_kindeId", ["kindeId"]),
 });
