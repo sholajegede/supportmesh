@@ -1,9 +1,23 @@
 import { withAuth } from "@kinde-oss/kinde-auth-nextjs/middleware";
+import type { NextRequest } from "next/server";
 
-export default withAuth({
-  publicPaths: ["/", "/login", "/api/auth", "/_next", "/favicon.ico"],
-});
+export default withAuth(
+  async function proxy(_req: NextRequest) {},
+  {
+    loginPage: "/login",
+    isReturnToCurrentPage: true,
+    publicPaths: [
+      "/",
+      "/login",
+      "/api/auth",
+      "/_next",
+      "/favicon.ico",
+    ],
+  }
+);
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+  ],
 };
