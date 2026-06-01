@@ -1,4 +1,6 @@
 import { Mastra } from "@mastra/core";
+import { triageAgent } from "./agents/triage-agent";
+import { summaryAgent } from "./agents/summary-agent";
 import { MastraAuthProvider } from "@mastra/core/server";
 import type { HonoRequest } from "hono";
 import { createRemoteJWKSet, jwtVerify } from "jose";
@@ -60,6 +62,10 @@ class MastraAuthKinde extends MastraAuthProvider<KindeClaims> {
 // runtime. During Next.js build the env var is absent and the URL constructor
 // would throw, so we skip auth configuration in that case.
 export const mastra = new Mastra({
+  agents: {
+    triageAgent,
+    summaryAgent,
+  },
   server: process.env.KINDE_DOMAIN
     ? {
         auth: new MastraAuthKinde({
