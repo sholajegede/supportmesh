@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { Analytics } from '@vercel/analytics/next'
 import { AppProviders } from "@/providers/ConvexKindeProvider"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { Toaster } from "@/components/ui/sonner"
 // @ts-ignore TS2307: Cannot find module or type declarations for side-effect import of './globals.css'.
 import "./globals.css";
 
@@ -52,6 +53,7 @@ export default function RootLayout({
           <TooltipProvider>
             {children}
           </TooltipProvider>
+          <Toaster position="bottom-right" />
         </AppProviders>
       </body>
     </html>

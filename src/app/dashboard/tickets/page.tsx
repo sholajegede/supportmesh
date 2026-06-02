@@ -5,10 +5,23 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { api } from "../../../../convex/_generated/api";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -17,6 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Loader2, Plus } from "lucide-react";
 import type { TicketPriority, SentimentScore, TicketStatus } from "@/types";
 
 const priorityCls: Record<TicketPriority, string> = {
@@ -52,7 +66,14 @@ type Tab = "all" | TicketStatus;
 export default function TicketsPage() {
   const [tab, setTab] = useState<Tab>("all");
 
-  const { getClaim } = useKindeBrowserClient();
+  // Sheet / form state
+  const [sheetOpen, setSheetOpen]         = useState(false);
+  const [subject, setSubject]             = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [message, setMessage]             = useState("");
+  const [isSubmitting, setIsSubmitting]   = useState(false);
+
+  const { getClaim, getToken } = useKindeBrowserClient();
   const orgCode = getClaim("org_code")?.value as string | undefined;
 
   const tickets = useQuery(
@@ -68,18 +89,123 @@ export default function TicketsPage() {
       : tickets.filter((t) => t.status === tab)
     : [];
 
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!orgCode) return;
+    setIsSubmitting(true);
+    try {
+      const token = getToken();
+      const res = await fetch("/api/agents/triage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ subject, body: message, customerEmail, orgCode }),
+      });
+      if (!res.ok) throw new Error("Request failed");
+      setSheetOpen(false);
+      setSubject("");
+      setCustomerEmail("");
+      setMessage("");
+      toast.success("Ticket submitted and triaged successfully");
+    } catch {
+      toast.error("Failed to submit ticket — try again");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6 p-8">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <h1 className="text-2xl font-semibold text-zinc-900">Tickets</h1>
-        {isLoading ? (
-          <Skeleton className="h-5 w-8 rounded-full" />
-        ) : (
-          <Badge variant="secondary" className="text-sm font-medium">
-            {tickets?.length ?? 0}
-          </Badge>
-        )}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold text-zinc-900">Tickets</h1>
+          {isLoading ? (
+            <Skeleton className="h-5 w-8 rounded-full" />
+          ) : (
+            <Badge variant="secondary" className="text-sm font-medium">
+              {tickets?.length ?? 0}
+            </Badge>
+          )}
+        </div>
+
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+          <SheetTrigger asChild>
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              New Ticket
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="w-full sm:max-w-md flex flex-col gap-0 p-0">
+            <SheetHeader className="border-b px-6 py-5">
+              <SheetTitle>New Support Ticket</SheetTitle>
+              <SheetDescription>
+                Submit a ticket to be automatically triaged by the AI agent.
+              </SheetDescription>
+            </SheetHeader>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5 px-6 py-6 flex-1">
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="subject">Subject <span className="text-red-500">*</span></Label>
+                <Input
+                  id="subject"
+                  placeholder="Brief description of the issue"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="customerEmail">Customer Email <span className="text-red-500">*</span></Label>
+                <Input
+                  id="customerEmail"
+                  type="email"
+                  placeholder="customer@example.com"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="message">
+                  Message <span className="text-red-500">*</span>
+                </Label>
+                <Textarea
+                  id="message"
+                  placeholder="Describe the issue in detail (minimum 20 characters)"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  required
+                  minLength={20}
+                  disabled={isSubmitting}
+                  className="min-h-[160px] resize-none"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2 mt-auto pt-2">
+                <Button type="submit" disabled={isSubmitting} className="w-full gap-2">
+                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {isSubmitting ? "Submitting…" : "Submit Ticket"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setSheetOpen(false)}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {/* Filter tabs */}

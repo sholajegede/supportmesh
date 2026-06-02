@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
+import { toast } from "sonner";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 import { api } from "../../../../../convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, AlertTriangle, BookOpen, Send, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, AlertTriangle, BookOpen, Send, CheckCircle2, Loader2 } from "lucide-react";
 import type { TicketPriority, SentimentScore, TicketStatus } from "@/types";
 
 const priorityCls: Record<TicketPriority, string> = {
@@ -71,6 +72,22 @@ export default function TicketDetailPage() {
     api.tickets.getTicketById,
     id ? { id: id as Id<"tickets"> } : "skip"
   );
+
+  const markResolved = useMutation(api.tickets.updateTicketStatus);
+  const [isResolving, setIsResolving] = useState(false);
+
+  async function handleMarkResolved() {
+    if (!ticket || ticket.status === "resolved") return;
+    setIsResolving(true);
+    try {
+      await markResolved({ id: ticket._id, status: "resolved" });
+      toast.success("Ticket marked as resolved");
+    } catch {
+      toast.error("Failed to update ticket status");
+    } finally {
+      setIsResolving(false);
+    }
+  }
 
   // Draft is undefined until user edits; falls back to ticket.draftResponse
   const [draft, setDraft] = useState<string | undefined>(undefined);
@@ -203,9 +220,18 @@ export default function TicketDetailPage() {
                   <Send className="h-3.5 w-3.5" />
                   Send Response
                 </Button>
-                <Button variant="outline" className="gap-2">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  Mark Resolved
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={handleMarkResolved}
+                  disabled={isResolving || ticket.status === "resolved"}
+                >
+                  {isResolving ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                  )}
+                  {ticket.status === "resolved" ? "Resolved" : "Mark Resolved"}
                 </Button>
               </div>
             </CardContent>
