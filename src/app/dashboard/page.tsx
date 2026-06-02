@@ -1,6 +1,12 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
+import { useQuery } from "convex/react";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+import { api } from "../../../convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -9,16 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { Inbox, Clock, AlertTriangle, CheckCircle2, Sparkles } from "lucide-react";
 import type { TicketPriority, SentimentScore, TicketStatus } from "@/types";
-
-function greeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  return "Good evening";
-}
 
 const priorityCls: Record<TicketPriority, string> = {
   critical: "bg-red-50 text-red-700 border-red-200",
@@ -39,24 +37,46 @@ const statusCls: Record<TicketStatus, string> = {
   resolved:    "bg-green-50 text-green-700 border-green-200",
 };
 
-const RECENT = [
-  { id: "t8", subject: "Slack integration stopped sending notifications", category: "technical",   priority: "critical" as TicketPriority, sentiment: "frustrated" as SentimentScore, status: "escalated"   as TicketStatus, created: "2h ago" },
-  { id: "t1", subject: "API rate limit exceeded on production endpoint",    category: "technical",   priority: "high"     as TicketPriority, sentiment: "negative"   as SentimentScore, status: "open"        as TicketStatus, created: "4h ago" },
-  { id: "t2", subject: "Unable to generate invoice for last billing cycle", category: "billing",     priority: "medium"   as TicketPriority, sentiment: "negative"   as SentimentScore, status: "open"        as TicketStatus, created: "6h ago" },
-  { id: "t5", subject: "Dashboard loading slowly for enterprise plan",      category: "technical",   priority: "medium"   as TicketPriority, sentiment: "neutral"    as SentimentScore, status: "in_progress" as TicketStatus, created: "8h ago" },
-  { id: "t3", subject: "Feature request: bulk export to CSV",               category: "feature_request", priority: "low" as TicketPriority, sentiment: "positive"   as SentimentScore, status: "resolved"    as TicketStatus, created: "1d ago" },
-];
+function greeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+}
 
-const STATS = [
-  { label: "Total Tickets", value: 24, icon: Inbox,         color: "text-zinc-600" },
-  { label: "Open",          value: 11, icon: Clock,         color: "text-blue-600" },
-  { label: "Escalated",     value:  3, icon: AlertTriangle, color: "text-red-600"  },
-  { label: "Resolved",      value: 10, icon: CheckCircle2,  color: "text-green-600" },
-];
+function timeAgo(creationTime: number): string {
+  const diffMs = Date.now() - creationTime;
+  const mins = Math.floor(diffMs / 60_000);
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
 
-export default async function DashboardPage() {
-  const { getUser } = getKindeServerSession();
-  const user = await getUser();
+export default function DashboardPage() {
+  const { user, getClaim } = useKindeBrowserClient();
+  const orgCode = getClaim("org_code")?.value as string | undefined;
+
+  const tickets = useQuery(
+    api.tickets.getTicketsByOrg,
+    orgCode ? { orgCode } : "skip"
+  );
+
+  const isLoading = tickets === undefined;
+
+  const total     = tickets?.length ?? 0;
+  const open      = tickets?.filter((t) => t.status === "open").length ?? 0;
+  const escalated = tickets?.filter((t) => t.status === "escalated").length ?? 0;
+  const resolved  = tickets?.filter((t) => t.status === "resolved").length ?? 0;
+
+  const recent = tickets?.slice(0, 5) ?? [];
+
+  const STATS = [
+    { label: "Total Tickets", value: total,     icon: Inbox,         color: "text-zinc-600"  },
+    { label: "Open",          value: open,      icon: Clock,         color: "text-blue-600"  },
+    { label: "Escalated",     value: escalated, icon: AlertTriangle, color: "text-red-600"   },
+    { label: "Resolved",      value: resolved,  icon: CheckCircle2,  color: "text-green-600" },
+  ];
 
   return (
     <div className="flex flex-col gap-8 p-8">
@@ -85,7 +105,11 @@ export default async function DashboardPage() {
               <Icon className={`h-4 w-4 ${color}`} />
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-zinc-900">{value}</p>
+              {isLoading ? (
+                <Skeleton className="h-9 w-16" />
+              ) : (
+                <p className="text-3xl font-bold text-zinc-900">{value}</p>
+              )}
             </CardContent>
           </Card>
         ))}
@@ -110,30 +134,57 @@ export default async function DashboardPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {RECENT.map((t) => (
-              <TableRow key={t.id} className="cursor-pointer hover:bg-zinc-50/60">
-                <TableCell className="max-w-[260px] truncate font-medium text-zinc-800">
-                  {t.subject}
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                </TableRow>
+              ))
+            ) : recent.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="py-12 text-center text-sm text-zinc-400">
+                  No tickets yet. Tickets will appear here once triage runs.
                 </TableCell>
-                <TableCell className="capitalize text-zinc-500 text-sm">{t.category.replace("_", " ")}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={`capitalize text-xs font-medium ${priorityCls[t.priority]}`}>
-                    {t.priority}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={`capitalize text-xs font-medium ${sentimentCls[t.sentiment]}`}>
-                    {t.sentiment}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={`capitalize text-xs font-medium ${statusCls[t.status]}`}>
-                    {t.status.replace("_", " ")}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-zinc-400 text-sm">{t.created}</TableCell>
               </TableRow>
-            ))}
+            ) : (
+              recent.map((t) => (
+                <TableRow key={String(t._id)} className="cursor-pointer hover:bg-zinc-50/60">
+                  <TableCell className="max-w-[260px] truncate font-medium text-zinc-800">
+                    {t.subject}
+                  </TableCell>
+                  <TableCell className="capitalize text-zinc-500 text-sm">
+                    {(t.category ?? "general").replace("_", " ")}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={`capitalize text-xs font-medium ${priorityCls[t.priority as TicketPriority]}`}>
+                      {t.priority}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {t.sentiment ? (
+                      <Badge variant="outline" className={`capitalize text-xs font-medium ${sentimentCls[t.sentiment as SentimentScore]}`}>
+                        {t.sentiment}
+                      </Badge>
+                    ) : (
+                      <span className="text-xs text-zinc-400">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={`capitalize text-xs font-medium ${statusCls[t.status as TicketStatus]}`}>
+                      {t.status.replace("_", " ")}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-zinc-400 text-sm">
+                    {timeAgo(t._creationTime)}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </Card>
