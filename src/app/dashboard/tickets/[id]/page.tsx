@@ -34,17 +34,6 @@ const statusCls: Record<TicketStatus, string> = {
   resolved:    "bg-green-50 text-green-700 border-green-200",
 };
 
-const KB_MATCHES = [
-  {
-    title: "Slack Integration Troubleshooting Guide",
-    content: "Common issues with Slack integration include expired OAuth tokens, revoked bot permissions, and webhook URL changes. Always verify the webhook endpoint returns 200 before investigating server-side.",
-  },
-  {
-    title: "Notification Queue Status and Recovery",
-    content: "If customers report missing notifications, check the notification queue dashboard. Queue backlogs over 500 items trigger automatic throttling. Manual queue flush may be required for critical accounts.",
-  },
-];
-
 function MetaRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between py-2.5">
@@ -68,13 +57,21 @@ export default function TicketDetailPage() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
 
+  // All hooks declared before any conditional early returns
   const ticket = useQuery(
     api.tickets.getTicketById,
     id ? { id: id as Id<"tickets"> } : "skip"
   );
 
+  // Use ticket.orgCode once loaded; "skip" while loading/not-found
+  const knowledge = useQuery(
+    api.knowledge.getKnowledgeByOrg,
+    ticket != null ? { orgCode: ticket.orgCode } : "skip"
+  );
+
   const markResolved = useMutation(api.tickets.updateTicketStatus);
   const [isResolving, setIsResolving] = useState(false);
+  const [draft, setDraft] = useState<string | undefined>(undefined);
 
   async function handleMarkResolved() {
     if (!ticket || ticket.status === "resolved") return;
@@ -89,8 +86,6 @@ export default function TicketDetailPage() {
     }
   }
 
-  // Draft is undefined until user edits; falls back to ticket.draftResponse
-  const [draft, setDraft] = useState<string | undefined>(undefined);
   const displayDraft = draft !== undefined ? draft : (ticket?.draftResponse ?? "");
 
   // ── Loading ────────────────────────────────────────────────────────────────
@@ -164,6 +159,25 @@ export default function TicketDetailPage() {
       </div>
     );
   }
+
+  // ── KB match computation (ticket is loaded) ────────────────────────────────
+  const kbWords = ticket.subject
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((w: string) => w.length > 3);
+
+  const kbMatches = knowledge
+    ? knowledge
+        .map((entry) => {
+          const haystack = `${entry.title} ${entry.content}`.toLowerCase();
+          const hits = kbWords.filter((w: string) => haystack.includes(w)).length;
+          return { entry, hits };
+        })
+        .filter(({ hits }) => hits > 0)
+        .sort((a, b) => b.hits - a.hits)
+        .slice(0, 3)
+        .map(({ entry }) => entry)
+    : null;
 
   // ── Loaded ─────────────────────────────────────────────────────────────────
   return (
@@ -292,7 +306,7 @@ export default function TicketDetailPage() {
             </Card>
           )}
 
-          {/* Knowledge base */}
+          {/* Knowledge base matches */}
           <Card className="shadow-none">
             <CardHeader className="border-b px-5 py-4">
               <CardTitle className="flex items-center gap-2 text-sm font-semibold text-zinc-700">
@@ -301,7 +315,38 @@ export default function TicketDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="px-5 py-0 divide-y divide-zinc-100">
-              {KB_MATCHES.map((entry, i) => (
+              {/* Loading */}
+              {knowledge === undefined && (
+                <>
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <div key={i} className="py-4 flex flex-col gap-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-full" />
+                      <Skeleton className="h-3 w-5/6" />
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {/* Empty KB */}
+              {knowledge !== undefined && knowledge.length === 0 && (
+                <p className="py-5 text-xs text-zinc-400 text-center">
+                  No knowledge base entries yet.{" "}
+                  <Link href="/dashboard/settings" className="underline hover:text-zinc-600">
+                    Add entries in Settings.
+                  </Link>
+                </p>
+              )}
+
+              {/* KB has entries but no matches */}
+              {knowledge !== undefined && knowledge.length > 0 && kbMatches !== null && kbMatches.length === 0 && (
+                <p className="py-5 text-xs text-zinc-400 text-center">
+                  No relevant entries found for this ticket.
+                </p>
+              )}
+
+              {/* Matches */}
+              {kbMatches !== null && kbMatches.map((entry, i) => (
                 <div key={i} className="py-4">
                   <p className="text-sm font-medium text-zinc-800">{entry.title}</p>
                   <p className="mt-1 text-xs text-zinc-500 leading-relaxed line-clamp-3">
