@@ -19,6 +19,45 @@ export const addKnowledgeEntry = mutation({
   },
 });
 
+export const updateKnowledgeEntry = mutation({
+  args: {
+    id: v.id("knowledgeBase"),
+    title: v.string(),
+    content: v.string(),
+  },
+  handler: async (ctx, { id, title, content }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const entry = await ctx.db.get(id);
+      if (entry) {
+        const identityOrgCode = identity["org_code"] as string | undefined;
+        if (identityOrgCode && identityOrgCode !== entry.orgCode) {
+          throw new ConvexError("Unauthorized: org_code mismatch");
+        }
+      }
+    }
+    await ctx.db.patch(id, { title, content });
+  },
+});
+
+export const deleteKnowledgeEntry = mutation({
+  args: { id: v.id("knowledgeBase") },
+  handler: async (ctx, { id }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const entry = await ctx.db.get(id);
+      if (entry) {
+        const identityOrgCode = identity["org_code"] as string | undefined;
+        if (identityOrgCode && identityOrgCode !== entry.orgCode) {
+          throw new ConvexError("Unauthorized: org_code mismatch");
+        }
+      }
+    }
+    const entry = await ctx.db.get(id);
+    if (entry) await ctx.db.delete(id);
+  },
+});
+
 export const getKnowledgeByOrg = query({
   args: { orgCode: v.string() },
   handler: async (ctx, { orgCode }) => {

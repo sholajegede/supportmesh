@@ -71,6 +71,7 @@ export default function TicketDetailPage() {
 
   const markResolved = useMutation(api.tickets.updateTicketStatus);
   const [isResolving, setIsResolving] = useState(false);
+  const [isSending, setIsSending]     = useState(false);
   const [draft, setDraft] = useState<string | undefined>(undefined);
 
   async function handleMarkResolved() {
@@ -83,6 +84,33 @@ export default function TicketDetailPage() {
       toast.error("Failed to update ticket status");
     } finally {
       setIsResolving(false);
+    }
+  }
+
+  async function handleSendResponse() {
+    if (!ticket) return;
+    setIsSending(true);
+    try {
+      const res = await fetch("/api/send-response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ticketId: String(ticket._id),
+          to: ticket.customerEmail,
+          subject: ticket.subject,
+          draftResponse: displayDraft,
+          orgCode: ticket.orgCode,
+        }),
+      });
+      if (!res.ok) throw new Error("Request failed");
+      toast.success(`Response sent to ${ticket.customerEmail}`);
+      if (ticket.status !== "resolved" && ticket.status !== "escalated") {
+        await markResolved({ id: ticket._id, status: "in_progress" });
+      }
+    } catch {
+      toast.error("Failed to send — try again");
+    } finally {
+      setIsSending(false);
     }
   }
 
@@ -230,9 +258,13 @@ export default function TicketDetailPage() {
                 className="min-h-[200px] resize-none text-sm text-zinc-700 leading-relaxed border-zinc-200 focus-visible:ring-1 focus-visible:ring-zinc-400"
               />
               <div className="flex items-center gap-3">
-                <Button className="gap-2">
-                  <Send className="h-3.5 w-3.5" />
-                  Send Response
+                <Button className="gap-2" onClick={handleSendResponse} disabled={isSending}>
+                  {isSending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Send className="h-3.5 w-3.5" />
+                  )}
+                  {isSending ? "Sending…" : "Send Response"}
                 </Button>
                 <Button
                   variant="outline"
