@@ -12,6 +12,10 @@ export default withAuth(
       "/api/auth",
       "/_next",
       "/favicon.ico",
+      "/submit",
+      "/api/v1",
+      "/api/mcp",
+      "/api/agents/triage",
     ],
   }
 );
