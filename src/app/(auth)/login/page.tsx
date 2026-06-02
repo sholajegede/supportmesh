@@ -31,7 +31,7 @@ export default function LoginPage() {
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-xl">Welcome back</CardTitle>
             <CardDescription>
-              Sign in to your organisation&apos;s workspace
+              Sign in to your organization&apos;s workspace
             </CardDescription>
           </CardHeader>
 

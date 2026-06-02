@@ -17,6 +17,7 @@
     "@mastra/core": "^1.37.1",
     "@mastra/memory": "^1.20.0",
     "@TODO-scope/auth-kinde": "github:sholajegede/mastra-auth-kinde",
+    "@vercel/analytics": "^2.0.1",
     "ai": "^6.0.193",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

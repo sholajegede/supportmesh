@@ -22,16 +22,16 @@ export default async function SettingsPage() {
       <div>
         <h1 className="text-2xl font-semibold text-zinc-900">Settings</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Manage your organisation and knowledge base.
+          Manage your organization and knowledge base.
         </p>
       </div>
 
-      {/* Organisation card */}
+      {/* Organization card */}
       <Card className="shadow-none">
         <CardHeader className="border-b px-6 py-4">
           <CardTitle className="flex items-center gap-2 text-base font-semibold text-zinc-900">
             <Building2 className="h-4 w-4 text-zinc-400" />
-            Organisation Settings
+            Organization Settings
           </CardTitle>
         </CardHeader>
         <CardContent className="px-6 py-5 flex flex-col gap-4">

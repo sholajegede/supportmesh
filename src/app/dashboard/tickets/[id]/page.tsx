@@ -94,7 +94,7 @@ export default function TicketDetailPage() {
     <div className="flex flex-col gap-6 p-8">
       {/* Back */}
       <Link
-        href="/tickets"
+        href="/dashboard/tickets"
         className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800 transition-colors w-fit"
       >
         <ArrowLeft className="h-3.5 w-3.5" />

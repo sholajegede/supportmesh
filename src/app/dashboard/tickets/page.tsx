@@ -101,12 +101,12 @@ export default function TicketsPage() {
               filtered.map((t) => (
                 <TableRow key={t.id} className="cursor-pointer hover:bg-zinc-50/60">
                   <TableCell className="text-sm text-zinc-500 max-w-[140px] truncate">
-                    <Link href={`/tickets/${t.id}`} className="block hover:underline">
+                    <Link href={`/dashboard/tickets/${t.id}`} className="block hover:underline">
                       {t.customer}
                     </Link>
                   </TableCell>
                   <TableCell className="max-w-[220px] font-medium text-zinc-800">
-                    <Link href={`/tickets/${t.id}`} className="block truncate hover:underline">
+                    <Link href={`/dashboard/tickets/${t.id}`} className="block truncate hover:underline">
                       {t.subject}
                     </Link>
                   </TableCell>

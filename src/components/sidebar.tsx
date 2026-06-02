@@ -14,8 +14,8 @@ interface SidebarProps {
 
 const NAV = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Tickets",   href: "/tickets",   icon: Ticket },
-  { label: "Settings",  href: "/settings",  icon: Settings },
+  { label: "Tickets",   href: "/dashboard/tickets",   icon: Ticket },
+  { label: "Settings",  href: "/dashboard/settings",  icon: Settings },
 ];
 
 function initials(name: string | null, email: string | null): string {

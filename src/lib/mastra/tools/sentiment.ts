@@ -7,7 +7,7 @@ export const getOrgTicketsTool = createTool({
   id: "get-org-tickets",
   description: "Get recent tickets for an org (used by the summary agent)",
   inputSchema: z.object({
-    orgCode: z.string().describe("The organisation code to fetch tickets for"),
+    orgCode: z.string().describe("The organization code to fetch tickets for"),
   }),
   execute: async ({ orgCode }) => {
     const tickets = await fetchQuery(api.tickets.getTicketsByOrg, { orgCode });

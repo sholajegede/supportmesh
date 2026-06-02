@@ -1,19 +1,38 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { ConvexClientProvider } from "@/components/convex-client-provider";
+import localFont from "next/font/local";
+import { Analytics } from '@vercel/analytics/next'
+import { AppProviders } from "@/providers/ConvexKindeProvider"
+import { TooltipProvider } from "@/components/ui/tooltip"
+// @ts-ignore TS2307: Cannot find module or type declarations for side-effect import of './globals.css'.
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const calSans = localFont({
+  src: [
+    {
+      path: '../fonts/CalSans-SemiBold.ttf',
+      weight: '600',
+      style: 'normal',
+    },
+    // Add other weights if you have the font files
+    // {
+    //   path: '../fonts/CalSans-Regular.ttf',
+    //   weight: '400',
+    //   style: 'normal',
+    // },
+    // {
+    //   path: '../fonts/CalSans-Medium.ttf',
+    //   weight: '500',
+    //   style: 'normal',
+    // },
+  ],
+  variable: '--font-cal-sans',
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const defaultUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(defaultUrl),
   title: "SupportMesh",
   description: "AI-powered support operations",
 };
@@ -26,10 +45,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${calSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <ConvexClientProvider>{children}</ConvexClientProvider>
+        <AppProviders>
+          <TooltipProvider>
+            {children}
+          </TooltipProvider>
+        </AppProviders>
       </body>
     </html>
   );

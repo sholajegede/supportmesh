@@ -15,7 +15,7 @@ export const triageAgent = new Agent({
   },
   instructions: `
 You are a support operations agent for SupportMesh. Your job is to triage
-incoming support tickets for a specific organisation.
+incoming support tickets for a specific organization.
 
 When given a ticket, you MUST do all of the following in order:
 1. Classify it into one of: billing, technical, account, feature_request, general

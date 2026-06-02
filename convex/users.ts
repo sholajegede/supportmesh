@@ -1,5 +1,5 @@
 import { internalMutation, internalQuery, query } from "./_generated/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
 export const createUserKinde = internalMutation({
   args: {
@@ -27,6 +27,22 @@ export const getUserKinde = internalQuery({
       .query("users")
       .withIndex("by_kindeId", (q) => q.eq("kindeId", kindeId))
       .unique();
+  },
+});
+
+export const getUserByKindeId = query({
+  args: { kindeId: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("kindeId"), args.kindeId))
+      .unique();
+
+    if (!user) {
+      throw new ConvexError("User not found");
+    }
+
+    return user;
   },
 });
 

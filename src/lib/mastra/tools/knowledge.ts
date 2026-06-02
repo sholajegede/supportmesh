@@ -8,7 +8,7 @@ export const searchKnowledgeTool = createTool({
   description:
     "Search the org's knowledge base for entries relevant to a ticket",
   inputSchema: z.object({
-    orgCode: z.string().describe("The organisation code"),
+    orgCode: z.string().describe("The organization code"),
     query: z.string().describe("Search query derived from the ticket subject"),
   }),
   execute: async ({ orgCode, query }) => {
