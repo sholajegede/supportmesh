@@ -19,8 +19,11 @@ const NAV = [
 ];
 
 function initials(name: string | null, email: string | null): string {
-  if (name) return name.slice(0, 2).toUpperCase();
-  if (email) return email.slice(0, 2).toUpperCase();
+  const first  = name  ? name[0].toUpperCase()                       : "";
+  const second = email ? email.split("@")[1]?.[0]?.toUpperCase() ?? "" : "";
+  if (first && second) return first + second;
+  if (first)  return first + first;
+  if (email)  return email.slice(0, 2).toUpperCase();
   return "??";
 }
 
@@ -53,7 +56,7 @@ export function Sidebar({ givenName, email }: SidebarProps) {
             className={cn(
               "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
               isActive(href)
-                ? "bg-zinc-100 text-zinc-900"
+                ? "bg-zinc-100 text-zinc-900 border-l-2 border-zinc-900"
                 : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800"
             )}
           >

@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Loader2, Plus } from "lucide-react";
+import { Inbox, Loader2, Plus } from "lucide-react";
 import type { TicketPriority, SentimentScore, TicketStatus } from "@/types";
 
 const priorityCls: Record<TicketPriority, string> = {
@@ -248,8 +248,11 @@ export default function TicketsPage() {
               ))
             ) : filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="py-12 text-center text-sm text-zinc-400">
-                  No tickets in this category.
+                <TableCell colSpan={7} className="py-16 text-center">
+                  <div className="flex flex-col items-center gap-2">
+                    <Inbox className="h-8 w-8 text-zinc-300" />
+                    <span className="text-sm text-zinc-400">No tickets in this category.</span>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (

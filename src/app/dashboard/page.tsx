@@ -25,7 +25,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Inbox, Clock, AlertTriangle, CheckCircle2, Sparkles, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { Inbox, Clock, AlertTriangle, CheckCircle2, Sparkles, Loader2, ArrowRight } from "lucide-react";
 import type { TicketPriority, SentimentScore, TicketStatus } from "@/types";
 
 const priorityCls: Record<TicketPriority, string> = {
@@ -94,10 +95,10 @@ export default function DashboardPage() {
   const recent = tickets?.slice(0, 5) ?? [];
 
   const STATS = [
-    { label: "Total Tickets", value: total,     icon: Inbox,         color: "text-zinc-600"  },
-    { label: "Open",          value: open,      icon: Clock,         color: "text-blue-600"  },
-    { label: "Escalated",     value: escalated, icon: AlertTriangle, color: "text-red-600"   },
-    { label: "Resolved",      value: resolved,  icon: CheckCircle2,  color: "text-green-600" },
+    { label: "Total Tickets", value: total,     icon: Inbox,         color: "text-zinc-600",  accent: "border-l-zinc-400"  },
+    { label: "Open",          value: open,      icon: Clock,         color: "text-blue-600",  accent: "border-l-blue-500"  },
+    { label: "Escalated",     value: escalated, icon: AlertTriangle, color: "text-red-600",   accent: "border-l-red-500"   },
+    { label: "Resolved",      value: resolved,  icon: CheckCircle2,  color: "text-green-600", accent: "border-l-green-500" },
   ];
 
   async function handleRunSummary() {
@@ -154,8 +155,8 @@ export default function DashboardPage() {
 
         {/* Stat cards */}
         <div className="grid grid-cols-4 gap-4">
-          {STATS.map(({ label, value, icon: Icon, color }) => (
-            <Card key={label} className="shadow-none">
+          {STATS.map(({ label, value, icon: Icon, color, accent }) => (
+            <Card key={label} className={`shadow-none border-l-2 ${accent}`}>
               <CardHeader className="flex flex-row items-center justify-between pb-2 pt-5">
                 <CardTitle className="text-sm font-medium text-zinc-500">{label}</CardTitle>
                 <Icon className={`h-4 w-4 ${color}`} />
@@ -244,6 +245,15 @@ export default function DashboardPage() {
             </TableBody>
           </Table>
         </Card>
+        <div className="flex justify-end">
+          <Link
+            href="/dashboard/tickets"
+            className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-800 transition-colors"
+          >
+            View all tickets
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
       </div>
 
       {/* Daily Summary Dialog */}

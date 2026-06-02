@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, AlertTriangle, BookOpen, Send, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowLeft, AlertTriangle, BookOpen, Send, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import type { TicketPriority, SentimentScore, TicketStatus } from "@/types";
 
 const priorityCls: Record<TicketPriority, string> = {
@@ -247,7 +247,10 @@ export default function TicketDetailPage() {
           {/* Draft response */}
           <Card className="shadow-none">
             <CardHeader className="border-b px-5 py-4">
-              <CardTitle className="text-sm font-semibold text-zinc-700">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold text-zinc-700">
+                <Badge variant="secondary" className="gap-1 text-xs">
+                  <Sparkles className="h-3 w-3" />AI
+                </Badge>
                 AI Draft Response
               </CardTitle>
             </CardHeader>
@@ -316,6 +319,11 @@ export default function TicketDetailPage() {
               <MetaRow label="Category">
                 <span className="text-sm font-medium text-zinc-700 capitalize">
                   {ticket.category ?? "general"}
+                </span>
+              </MetaRow>
+              <MetaRow label="Org Code">
+                <span className="font-mono text-xs text-zinc-700">
+                  {ticket.orgCode}
                 </span>
               </MetaRow>
             </CardContent>

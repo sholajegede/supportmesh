@@ -198,9 +198,10 @@ export default function SettingsPage() {
 
           {/* Empty */}
           {knowledge !== undefined && knowledge.length === 0 && !showAdd && (
-            <p className="py-6 text-sm text-zinc-400 text-center">
-              No knowledge base entries yet.
-            </p>
+            <div className="py-16 flex flex-col items-center gap-2">
+              <BookOpen className="h-8 w-8 text-zinc-300" />
+              <p className="text-sm text-zinc-400">No knowledge base entries yet.</p>
+            </div>
           )}
 
           {/* Entry list */}
