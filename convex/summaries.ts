@@ -1,5 +1,5 @@
 import { mutationGeneric as mutation, queryGeneric as query } from "convex/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
 export const saveSummary = mutation({
   args: {
@@ -14,6 +14,13 @@ export const saveSummary = mutation({
     longRunningTickets: v.array(v.string()),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const identityOrgCode = identity["org_code"] as string | undefined;
+      if (identityOrgCode && identityOrgCode !== args.orgCode) {
+        throw new ConvexError("Unauthorized: org_code mismatch");
+      }
+    }
     const existing = await ctx.db
       .query("summaries")
       .withIndex("by_orgCode", (q) => q.eq("orgCode", args.orgCode))
@@ -35,6 +42,13 @@ export const getSummaryByOrgAndDate = query({
     date: v.string(),
   },
   handler: async (ctx, { orgCode, date }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const identityOrgCode = identity["org_code"] as string | undefined;
+      if (identityOrgCode && identityOrgCode !== orgCode) {
+        throw new ConvexError("Unauthorized: org_code mismatch");
+      }
+    }
     return await ctx.db
       .query("summaries")
       .withIndex("by_orgCode", (q) => q.eq("orgCode", orgCode))

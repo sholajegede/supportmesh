@@ -1,5 +1,5 @@
 import { mutationGeneric as mutation, queryGeneric as query } from "convex/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
 export const createTicket = mutation({
   args: {
@@ -15,6 +15,13 @@ export const createTicket = mutation({
     escalationReason: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const identityOrgCode = identity["org_code"] as string | undefined;
+      if (identityOrgCode && identityOrgCode !== args.orgCode) {
+        throw new ConvexError("Unauthorized: org_code mismatch");
+      }
+    }
     return await ctx.db.insert("tickets", args);
   },
 });
@@ -32,6 +39,16 @@ export const updateTicket = mutation({
     escalationReason: v.optional(v.string()),
   },
   handler: async (ctx, { id, ...patch }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const ticket = await ctx.db.get(id);
+      if (ticket) {
+        const identityOrgCode = identity["org_code"] as string | undefined;
+        if (identityOrgCode && identityOrgCode !== ticket.orgCode) {
+          throw new ConvexError("Unauthorized: org_code mismatch");
+        }
+      }
+    }
     await ctx.db.patch(id, patch);
   },
 });
@@ -42,6 +59,16 @@ export const updateTicketStatus = mutation({
     status: v.string(),
   },
   handler: async (ctx, { id, status }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const ticket = await ctx.db.get(id);
+      if (ticket) {
+        const identityOrgCode = identity["org_code"] as string | undefined;
+        if (identityOrgCode && identityOrgCode !== ticket.orgCode) {
+          throw new ConvexError("Unauthorized: org_code mismatch");
+        }
+      }
+    }
     await ctx.db.patch(id, { status });
   },
 });
@@ -49,6 +76,13 @@ export const updateTicketStatus = mutation({
 export const getTicketsByOrg = query({
   args: { orgCode: v.string() },
   handler: async (ctx, { orgCode }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const identityOrgCode = identity["org_code"] as string | undefined;
+      if (identityOrgCode && identityOrgCode !== orgCode) {
+        throw new ConvexError("Unauthorized: org_code mismatch");
+      }
+    }
     return await ctx.db
       .query("tickets")
       .filter((q) => q.eq(q.field("orgCode"), orgCode))
@@ -60,6 +94,14 @@ export const getTicketsByOrg = query({
 export const getTicketById = query({
   args: { id: v.id("tickets") },
   handler: async (ctx, { id }) => {
-    return await ctx.db.get(id);
+    const identity = await ctx.auth.getUserIdentity();
+    const ticket = await ctx.db.get(id);
+    if (identity && ticket) {
+      const identityOrgCode = identity["org_code"] as string | undefined;
+      if (identityOrgCode && identityOrgCode !== ticket.orgCode) {
+        throw new ConvexError("Unauthorized: org_code mismatch");
+      }
+    }
+    return ticket;
   },
 });
