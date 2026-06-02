@@ -2,11 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useQuery } from "convex/react";
+import type { Id } from "../../../../../convex/_generated/dataModel";
+import { api } from "../../../../../convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, AlertTriangle, BookOpen, Send, CheckCircle2 } from "lucide-react";
 import type { TicketPriority, SentimentScore, TicketStatus } from "@/types";
 
@@ -29,44 +33,6 @@ const statusCls: Record<TicketStatus, string> = {
   resolved:    "bg-green-50 text-green-700 border-green-200",
 };
 
-const TICKET = {
-  id: "t8",
-  subject: "Slack integration stopped sending notifications",
-  body: `Hi support team,
-
-We've been using SupportMesh's Slack integration for the past 3 months and it's been working perfectly. However, since yesterday morning (around 09:00 UTC) we have completely stopped receiving any notifications in our #support-alerts channel.
-
-I've checked our Slack workspace permissions and the bot is still installed and has the correct scopes. Our webhook URL is still valid — I tested it manually and it returned a 200 OK. The issue seems to be on the SupportMesh side.
-
-This is affecting our entire support team's ability to respond to urgent tickets in real time. We have SLAs with our enterprise clients and this outage is putting us in breach of those agreements.
-
-Could you please investigate this urgently? We need this resolved within the next 2 hours.
-
-Thanks,
-Carlos`,
-  customerEmail: "carlos@acme.io",
-  orgCode: "org_acme",
-  status: "escalated" as TicketStatus,
-  priority: "critical" as TicketPriority,
-  sentiment: "frustrated" as SentimentScore,
-  category: "technical",
-  draftResponse: `Hi Carlos,
-
-Thank you for reaching out and I completely understand the urgency here. I can see this is directly impacting your team's ability to meet your SLAs, and I'm treating this as our highest priority.
-
-I've escalated this to our infrastructure team immediately. Our logs show an issue with the Slack notification queue that began at 08:47 UTC yesterday, which aligns with what you're experiencing.
-
-We're deploying a fix now and expect full notification delivery to resume within 30–45 minutes. I'll keep you updated every 15 minutes until it's resolved.
-
-Apologies for the disruption to your workflow.
-
-Best,
-SupportMesh Team`,
-  escalationReason: "Customer reported active SLA breach risk with enterprise clients. Critical priority. System-level issue confirmed on our end.",
-  createdAt: "2026-06-02T08:14:00Z",
-  updatedAt: "2026-06-02T09:30:00Z",
-};
-
 const KB_MATCHES = [
   {
     title: "Slack Integration Troubleshooting Guide",
@@ -87,26 +53,112 @@ function MetaRow({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
-export default function TicketDetailPage() {
-  const [draft, setDraft] = useState(TICKET.draftResponse);
+const BACK = (
+  <Link
+    href="/dashboard/tickets"
+    className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800 transition-colors w-fit"
+  >
+    <ArrowLeft className="h-3.5 w-3.5" />
+    All Tickets
+  </Link>
+);
 
+export default function TicketDetailPage() {
+  const params = useParams<{ id: string }>();
+  const id = params?.id;
+
+  const ticket = useQuery(
+    api.tickets.getTicketById,
+    id ? { id: id as Id<"tickets"> } : "skip"
+  );
+
+  // Draft is undefined until user edits; falls back to ticket.draftResponse
+  const [draft, setDraft] = useState<string | undefined>(undefined);
+  const displayDraft = draft !== undefined ? draft : (ticket?.draftResponse ?? "");
+
+  // ── Loading ────────────────────────────────────────────────────────────────
+  if (ticket === undefined) {
+    return (
+      <div className="flex flex-col gap-6 p-8">
+        {BACK}
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-7 w-2/3" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <div className="grid grid-cols-5 gap-6">
+          <div className="col-span-3 flex flex-col gap-5">
+            <Card className="shadow-none">
+              <CardHeader className="border-b px-5 py-4">
+                <Skeleton className="h-4 w-32" />
+              </CardHeader>
+              <CardContent className="px-5 py-4 flex flex-col gap-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
+                <Skeleton className="h-4 w-4/6" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+              </CardContent>
+            </Card>
+            <Card className="shadow-none">
+              <CardHeader className="border-b px-5 py-4">
+                <Skeleton className="h-4 w-36" />
+              </CardHeader>
+              <CardContent className="px-5 py-4">
+                <Skeleton className="h-[200px] w-full rounded-md" />
+              </CardContent>
+            </Card>
+          </div>
+          <div className="col-span-2 flex flex-col gap-5">
+            <Card className="shadow-none">
+              <CardHeader className="border-b px-5 py-4">
+                <Skeleton className="h-4 w-28" />
+              </CardHeader>
+              <CardContent className="px-5 divide-y divide-zinc-100">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="flex items-center justify-between py-2.5">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-5 w-20 rounded-full" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Not found ──────────────────────────────────────────────────────────────
+  if (ticket === null) {
+    return (
+      <div className="flex flex-col gap-6 p-8">
+        {BACK}
+        <div className="flex flex-col items-center justify-center py-24 gap-3">
+          <p className="text-lg font-medium text-zinc-800">Ticket not found</p>
+          <p className="text-sm text-zinc-500">
+            This ticket may have been deleted or you don&apos;t have access to it.
+          </p>
+          <Link href="/dashboard/tickets">
+            <Button variant="outline" size="sm" className="mt-2">
+              Back to Tickets
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Loaded ─────────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col gap-6 p-8">
-      {/* Back */}
-      <Link
-        href="/dashboard/tickets"
-        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800 transition-colors w-fit"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        All Tickets
-      </Link>
+      {BACK}
 
       {/* Subject */}
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">{TICKET.subject}</h1>
+        <h1 className="text-xl font-semibold text-zinc-900">{ticket.subject}</h1>
         <p className="mt-1 text-sm text-zinc-400">
-          {TICKET.customerEmail} &middot; Opened{" "}
-          {new Date(TICKET.createdAt).toLocaleString("en-US", {
+          {ticket.customerEmail} &middot; Opened{" "}
+          {new Date(ticket._creationTime).toLocaleString("en-US", {
             month: "short",
             day: "numeric",
             hour: "2-digit",
@@ -128,7 +180,7 @@ export default function TicketDetailPage() {
             </CardHeader>
             <CardContent className="px-5 py-4">
               <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-zinc-700">
-                {TICKET.body}
+                {ticket.body}
               </pre>
             </CardContent>
           </Card>
@@ -142,7 +194,7 @@ export default function TicketDetailPage() {
             </CardHeader>
             <CardContent className="px-5 py-4 flex flex-col gap-4">
               <Textarea
-                value={draft}
+                value={displayDraft}
                 onChange={(e) => setDraft(e.target.value)}
                 className="min-h-[200px] resize-none text-sm text-zinc-700 leading-relaxed border-zinc-200 focus-visible:ring-1 focus-visible:ring-zinc-400"
               />
@@ -171,30 +223,34 @@ export default function TicketDetailPage() {
             </CardHeader>
             <CardContent className="px-5 divide-y divide-zinc-100">
               <MetaRow label="Status">
-                <Badge variant="outline" className={`capitalize text-xs font-medium ${statusCls[TICKET.status]}`}>
-                  {TICKET.status.replace("_", " ")}
+                <Badge variant="outline" className={`capitalize text-xs font-medium ${statusCls[ticket.status as TicketStatus]}`}>
+                  {ticket.status.replace("_", " ")}
                 </Badge>
               </MetaRow>
               <MetaRow label="Priority">
-                <Badge variant="outline" className={`capitalize text-xs font-medium ${priorityCls[TICKET.priority]}`}>
-                  {TICKET.priority}
+                <Badge variant="outline" className={`capitalize text-xs font-medium ${priorityCls[ticket.priority as TicketPriority]}`}>
+                  {ticket.priority}
                 </Badge>
               </MetaRow>
               <MetaRow label="Sentiment">
-                <Badge variant="outline" className={`capitalize text-xs font-medium ${sentimentCls[TICKET.sentiment]}`}>
-                  {TICKET.sentiment}
-                </Badge>
+                {ticket.sentiment ? (
+                  <Badge variant="outline" className={`capitalize text-xs font-medium ${sentimentCls[ticket.sentiment as SentimentScore]}`}>
+                    {ticket.sentiment}
+                  </Badge>
+                ) : (
+                  <span className="text-xs text-zinc-400">—</span>
+                )}
               </MetaRow>
               <MetaRow label="Category">
                 <span className="text-sm font-medium text-zinc-700 capitalize">
-                  {TICKET.category}
+                  {ticket.category ?? "general"}
                 </span>
               </MetaRow>
             </CardContent>
           </Card>
 
           {/* Escalation warning */}
-          {TICKET.status === "escalated" && (
+          {ticket.status === "escalated" && (
             <Card className="shadow-none border-red-200 bg-red-50/50">
               <CardHeader className="px-5 py-4 pb-2">
                 <CardTitle className="flex items-center gap-2 text-sm font-semibold text-red-700">
@@ -204,7 +260,7 @@ export default function TicketDetailPage() {
               </CardHeader>
               <CardContent className="px-5 pb-4">
                 <p className="text-sm text-red-600 leading-relaxed">
-                  {TICKET.escalationReason}
+                  {ticket.escalationReason ?? "This ticket has been escalated for immediate attention."}
                 </p>
               </CardContent>
             </Card>
