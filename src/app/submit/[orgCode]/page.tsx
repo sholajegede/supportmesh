@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
+import { useQuery } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,11 +12,11 @@ import { Zap, Loader2, CheckCircle2 } from "lucide-react";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
-const isValidOrgCode = (code: string) => /^org_[a-zA-Z0-9]+$/.test(code);
-
 export default function SubmitTicketPage() {
   const params = useParams<{ orgCode: string }>();
   const orgCode = params?.orgCode ?? "";
+
+  const org = useQuery(api.orgs.getOrgByCode, orgCode ? { orgCode } : "skip");
 
   const [state, setState]           = useState<FormState>("idle");
   const [email, setEmail]           = useState("");
@@ -61,7 +63,17 @@ export default function SubmitTicketPage() {
     setSubmittedEmail("");
   }
 
-  if (!orgCode || !isValidOrgCode(orgCode)) {
+  // Loading
+  if (org === undefined) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-zinc-400" />
+      </div>
+    );
+  }
+
+  // Not found
+  if (org === null) {
     return (
       <div className="min-h-screen bg-background flex items-start justify-center px-4 pt-16 pb-12">
         <div className="w-full max-w-lg">
@@ -121,7 +133,7 @@ export default function SubmitTicketPage() {
           <>
             <div className="mb-7">
               <h1 className="text-2xl font-semibold text-zinc-900">
-                Submit a support request
+                Submit a request to {org.orgName}
               </h1>
               <p className="mt-1.5 text-sm text-zinc-500">
                 Fill in the details below and our team will get back to you as
