@@ -41,15 +41,23 @@ export default function HomePage() {
                 SupportMesh
               </span>
             </div>
-            <LoginLink>
-              <Button
-                size="sm"
-                variant="secondary"
-                className="h-8 px-4 text-xs transition-all duration-200 hover:ring-2 hover:ring-white/30 hover:ring-offset-1 hover:ring-offset-zinc-950"
+            <div className="flex items-center gap-5">
+              <Link
+                href="/pricing"
+                className="text-sm text-zinc-400 hover:text-zinc-300 transition-colors"
               >
-                Sign in
-              </Button>
-            </LoginLink>
+                Pricing
+              </Link>
+              <LoginLink>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-8 px-4 text-xs transition-all duration-200 hover:ring-2 hover:ring-white/30 hover:ring-offset-1 hover:ring-offset-zinc-950"
+                >
+                  Sign in
+                </Button>
+              </LoginLink>
+            </div>
           </div>
         </header>
 

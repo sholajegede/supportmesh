@@ -73,6 +73,44 @@ export const updateTicketStatus = mutation({
   },
 });
 
+export const assignTicket = mutation({
+  args: {
+    id: v.id("tickets"),
+    assignedTo: v.string(),
+    assignedName: v.string(),
+  },
+  handler: async (ctx, { id, assignedTo, assignedName }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const ticket = await ctx.db.get(id);
+      if (ticket) {
+        const identityOrgCode = identity["org_code"] as string | undefined;
+        if (identityOrgCode && identityOrgCode !== ticket.orgCode) {
+          throw new ConvexError("Unauthorized: org_code mismatch");
+        }
+      }
+    }
+    await ctx.db.patch(id, { assignedTo, assignedName });
+  },
+});
+
+export const unassignTicket = mutation({
+  args: { id: v.id("tickets") },
+  handler: async (ctx, { id }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const ticket = await ctx.db.get(id);
+      if (ticket) {
+        const identityOrgCode = identity["org_code"] as string | undefined;
+        if (identityOrgCode && identityOrgCode !== ticket.orgCode) {
+          throw new ConvexError("Unauthorized: org_code mismatch");
+        }
+      }
+    }
+    await ctx.db.patch(id, { assignedTo: undefined, assignedName: undefined });
+  },
+});
+
 export const getTicketsByOrg = query({
   args: { orgCode: v.string() },
   handler: async (ctx, { orgCode }) => {
@@ -103,5 +141,28 @@ export const getTicketById = query({
       }
     }
     return ticket;
+  },
+});
+
+export const getTicketsByCustomerEmail = query({
+  args: { orgCode: v.string(), customerEmail: v.string() },
+  handler: async (ctx, { orgCode, customerEmail }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const identityOrgCode = identity["org_code"] as string | undefined;
+      if (identityOrgCode && identityOrgCode !== orgCode) {
+        throw new ConvexError("Unauthorized: org_code mismatch");
+      }
+    }
+    return await ctx.db
+      .query("tickets")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("orgCode"), orgCode),
+          q.eq(q.field("customerEmail"), customerEmail)
+        )
+      )
+      .order("desc")
+      .collect();
   },
 });

@@ -230,6 +230,7 @@ export default function TicketsPage() {
               <TableHead className="text-xs">Priority</TableHead>
               <TableHead className="text-xs">Sentiment</TableHead>
               <TableHead className="text-xs">Status</TableHead>
+              <TableHead className="text-xs">Assigned to</TableHead>
               <TableHead className="text-xs">Created</TableHead>
             </TableRow>
           </TableHeader>
@@ -243,12 +244,13 @@ export default function TicketsPage() {
                   <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-12" /></TableCell>
                 </TableRow>
               ))
             ) : filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="py-16 text-center">
+                <TableCell colSpan={8} className="py-16 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <Inbox className="h-8 w-8 text-zinc-300" />
                     <span className="text-sm text-zinc-400">No tickets in this category.</span>
@@ -289,6 +291,11 @@ export default function TicketsPage() {
                     <Badge variant="outline" className={`capitalize text-xs font-medium ${statusCls[t.status as TicketStatus]}`}>
                       {t.status.replace("_", " ")}
                     </Badge>
+                  </TableCell>
+                  <TableCell className="text-sm text-zinc-500 max-w-[120px] truncate">
+                    {(t as { assignedName?: string }).assignedName ?? (
+                      <span className="text-zinc-300">Unassigned</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-sm text-zinc-400">
                     {timeAgo(t._creationTime)}

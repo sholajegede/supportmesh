@@ -44,3 +44,48 @@ export const getOrgByCode = query({
       .unique();
   },
 });
+
+export const updateOrgSlackWebhook = mutation({
+  args: {
+    orgCode: v.string(),
+    slackWebhookUrl: v.string(),
+  },
+  handler: async (ctx, { orgCode, slackWebhookUrl }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const identityOrgCode = identity["org_code"] as string | undefined;
+      if (identityOrgCode && identityOrgCode !== orgCode) {
+        throw new ConvexError("Unauthorized: org_code mismatch");
+      }
+    }
+    const org = await ctx.db
+      .query("orgs")
+      .withIndex("by_orgCode", (q) => q.eq("orgCode", orgCode))
+      .unique();
+    if (!org) throw new ConvexError("Organisation not found");
+    await ctx.db.patch(org._id, { slackWebhookUrl });
+  },
+});
+
+export const updateOrgBranding = mutation({
+  args: {
+    orgCode: v.string(),
+    brandName: v.optional(v.string()),
+    brandColor: v.optional(v.string()),
+  },
+  handler: async (ctx, { orgCode, brandName, brandColor }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const identityOrgCode = identity["org_code"] as string | undefined;
+      if (identityOrgCode && identityOrgCode !== orgCode) {
+        throw new ConvexError("Unauthorized: org_code mismatch");
+      }
+    }
+    const org = await ctx.db
+      .query("orgs")
+      .withIndex("by_orgCode", (q) => q.eq("orgCode", orgCode))
+      .unique();
+    if (!org) throw new ConvexError("Organisation not found");
+    await ctx.db.patch(org._id, { brandName, brandColor });
+  },
+});

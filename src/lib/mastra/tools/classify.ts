@@ -1,7 +1,9 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
-import { fetchMutation } from "convex/nextjs";
+import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../convex/_generated/api";
+
+const BASE_URL = "https://supportmesh-agent.vercel.app";
 
 export const saveTriageResultTool = createTool({
   id: "save-triage-result",
@@ -42,6 +44,42 @@ export const saveTriageResultTool = createTool({
       draftResponse,
       escalationReason: escalationReason ?? undefined,
     });
+
+    // Fire Slack notification if org has a webhook configured
+    const org = await fetchQuery(api.orgs.getOrgByCode, { orgCode });
+    const slackWebhookUrl = (org as { slackWebhookUrl?: string } | null)?.slackWebhookUrl;
+    if (slackWebhookUrl) {
+      try {
+        await fetch(slackWebhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: `New ticket: ${subject}`,
+            blocks: [
+              {
+                type: "section",
+                text: {
+                  type: "mrkdwn",
+                  text: `*${subject}*\nPriority: *${priority}* · Sentiment: *${sentiment}*\nFrom: ${customerEmail}`,
+                },
+              },
+              {
+                type: "actions",
+                elements: [
+                  {
+                    type: "button",
+                    text: { type: "plain_text", text: "View ticket" },
+                    url: `${BASE_URL}/dashboard/tickets/${ticketId}`,
+                  },
+                ],
+              },
+            ],
+          }),
+        });
+      } catch (err) {
+        console.error("Slack notification failed:", err);
+      }
+    }
 
     return { ticketId };
   },

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Code2, LayoutDashboard, Settings, Ticket, Zap } from "lucide-react";
+import { BookOpen, Code2, LayoutDashboard, Settings, Ticket, Users, Zap } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ const NAV = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Tickets",        href: "/dashboard/tickets",    icon: Ticket },
   { label: "Knowledge Base", href: "/dashboard/knowledge",  icon: BookOpen },
+  { label: "Customers",      href: "/dashboard/customers",  icon: Users },
   { label: "Developer",      href: "/dashboard/developer",  icon: Code2 },
   { label: "Settings",       href: "/dashboard/settings",   icon: Settings },
 ];

@@ -10,9 +10,10 @@ import { api } from "../../../../../convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, AlertTriangle, BookOpen, Send, CheckCircle2, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, AlertTriangle, BookOpen, Send, CheckCircle2, Loader2, Sparkles, X } from "lucide-react";
 import type { TicketPriority, SentimentScore, TicketStatus } from "@/types";
 
 const priorityCls: Record<TicketPriority, string> = {
@@ -69,10 +70,18 @@ export default function TicketDetailPage() {
     ticket != null ? { orgCode: ticket.orgCode } : "skip"
   );
 
-  const markResolved = useMutation(api.tickets.updateTicketStatus);
-  const [isResolving, setIsResolving] = useState(false);
-  const [isSending, setIsSending]     = useState(false);
-  const [draft, setDraft] = useState<string | undefined>(undefined);
+  const markResolved  = useMutation(api.tickets.updateTicketStatus);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const assignTicket  = useMutation((api as any).tickets.assignTicket);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const unassignTicket = useMutation((api as any).tickets.unassignTicket);
+
+  const [isResolving, setIsResolving]   = useState(false);
+  const [isSending, setIsSending]       = useState(false);
+  const [draft, setDraft]               = useState<string | undefined>(undefined);
+  const [assignInput, setAssignInput]   = useState("");
+  const [isAssigning, setIsAssigning]   = useState(false);
+  const [showAssignForm, setShowAssignForm] = useState(false);
 
   async function handleMarkResolved() {
     if (!ticket || ticket.status === "resolved") return;
@@ -111,6 +120,39 @@ export default function TicketDetailPage() {
       toast.error("Failed to send — try again");
     } finally {
       setIsSending(false);
+    }
+  }
+
+  async function handleAssign(e: React.FormEvent) {
+    e.preventDefault();
+    if (!ticket || !assignInput.trim()) return;
+    setIsAssigning(true);
+    try {
+      await assignTicket({
+        id: ticket._id,
+        assignedTo: assignInput.trim(),
+        assignedName: assignInput.trim(),
+      });
+      toast.success("Ticket assigned");
+      setAssignInput("");
+      setShowAssignForm(false);
+    } catch {
+      toast.error("Failed to assign ticket");
+    } finally {
+      setIsAssigning(false);
+    }
+  }
+
+  async function handleUnassign() {
+    if (!ticket) return;
+    setIsAssigning(true);
+    try {
+      await unassignTicket({ id: ticket._id });
+      toast.success("Ticket unassigned");
+    } catch {
+      toast.error("Failed to unassign ticket");
+    } finally {
+      setIsAssigning(false);
     }
   }
 
@@ -321,6 +363,51 @@ export default function TicketDetailPage() {
                   {ticket.category ?? "general"}
                 </span>
               </MetaRow>
+              {/* Assignment */}
+              <div className="py-2.5">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-sm text-zinc-500">Assigned to</span>
+                  {(ticket as { assignedName?: string }).assignedName ? (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm font-medium text-zinc-700">
+                        {(ticket as { assignedName?: string }).assignedName}
+                      </span>
+                      <button
+                        onClick={handleUnassign}
+                        disabled={isAssigning}
+                        className="text-zinc-400 hover:text-red-500 transition-colors"
+                        title="Unassign"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowAssignForm((v) => !v)}
+                      className="text-xs text-zinc-400 hover:text-zinc-700 transition-colors"
+                    >
+                      {showAssignForm ? "Cancel" : "Assign"}
+                    </button>
+                  )}
+                </div>
+                {showAssignForm && !(ticket as { assignedName?: string }).assignedName && (
+                  <form onSubmit={handleAssign} className="flex gap-1.5 mt-1">
+                    <Input
+                      placeholder="Name or email"
+                      value={assignInput}
+                      onChange={(e) => setAssignInput(e.target.value)}
+                      disabled={isAssigning}
+                      className="h-7 text-xs"
+                    />
+                    <Button type="submit" size="sm" disabled={isAssigning || !assignInput.trim()} className="h-7 text-xs px-2">
+                      Save
+                    </Button>
+                  </form>
+                )}
+                {!(ticket as { assignedName?: string }).assignedName && !showAssignForm && (
+                  <span className="text-xs text-zinc-400">Unassigned</span>
+                )}
+              </div>
               <MetaRow label="Org Code">
                 <span className="font-mono text-xs text-zinc-700">
                   {ticket.orgCode}

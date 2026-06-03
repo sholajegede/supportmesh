@@ -12,11 +12,17 @@ import { Zap, Loader2, CheckCircle2 } from "lucide-react";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
+type OrgData = {
+  orgName: string;
+  brandName?: string;
+  brandColor?: string;
+} | null | undefined;
+
 export default function SubmitTicketPage() {
   const params = useParams<{ orgCode: string }>();
   const orgCode = params?.orgCode ?? "";
 
-  const org = useQuery(api.orgs.getOrgByCode, orgCode ? { orgCode } : "skip");
+  const org = useQuery(api.orgs.getOrgByCode, orgCode ? { orgCode } : "skip") as OrgData;
 
   const [state, setState]           = useState<FormState>("idle");
   const [email, setEmail]           = useState("");
@@ -97,16 +103,22 @@ export default function SubmitTicketPage() {
     );
   }
 
+  const displayName = org.brandName ?? "SupportMesh";
+  const brandColor  = org.brandColor ?? null;
+
   return (
     <div className="min-h-screen bg-background flex items-start justify-center px-4 pt-16 pb-12">
       <div className="w-full max-w-lg">
         {/* Brand */}
         <div className="flex items-center gap-2.5 mb-8">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900">
+          <div
+            className="flex h-8 w-8 items-center justify-center rounded-lg"
+            style={{ backgroundColor: brandColor ?? "#18181b" }}
+          >
             <Zap className="h-4 w-4 text-white" />
           </div>
           <span className="text-lg font-semibold tracking-tight text-zinc-900">
-            SupportMesh
+            {displayName}
           </span>
         </div>
 
@@ -193,7 +205,12 @@ export default function SubmitTicketPage() {
                 </p>
               )}
 
-              <Button type="submit" disabled={isLoading} className="w-full gap-2">
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full gap-2"
+                style={brandColor ? { backgroundColor: brandColor, color: "#ffffff", borderColor: brandColor } : undefined}
+              >
                 {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {isLoading ? "Submitting…" : "Submit ticket"}
               </Button>

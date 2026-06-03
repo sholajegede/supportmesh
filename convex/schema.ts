@@ -13,11 +13,16 @@ export default defineSchema({
     category: v.optional(v.string()),
     draftResponse: v.optional(v.string()),
     escalationReason: v.optional(v.string()),
+    assignedTo: v.optional(v.string()),
+    assignedName: v.optional(v.string()),
   }),
 
   orgs: defineTable({
     orgCode: v.string(),
     orgName: v.string(),
+    slackWebhookUrl: v.optional(v.string()),
+    brandName: v.optional(v.string()),
+    brandColor: v.optional(v.string()),
   }).index("by_orgCode", ["orgCode"]),
 
   knowledgeBase: defineTable({

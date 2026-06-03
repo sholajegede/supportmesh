@@ -9,6 +9,7 @@ export default withAuth(
     publicPaths: [
       "/",
       "/login",
+      "/pricing",
       "/api/auth",
       "/_next",
       "/favicon.ico",
