@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Ticket, Settings, Zap } from "lucide-react";
+import { BookOpen, LayoutDashboard, Settings, Ticket, Zap } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -14,8 +14,9 @@ interface SidebarProps {
 
 const NAV = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Tickets",   href: "/dashboard/tickets",   icon: Ticket },
-  { label: "Settings",  href: "/dashboard/settings",  icon: Settings },
+  { label: "Tickets",        href: "/dashboard/tickets",    icon: Ticket },
+  { label: "Knowledge Base", href: "/dashboard/knowledge", icon: BookOpen },
+  { label: "Settings",       href: "/dashboard/settings",  icon: Settings },
 ];
 
 function initials(name: string | null, email: string | null): string {
