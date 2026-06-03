@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { ArrowRight, BookOpen, Building2, CheckCircle2, Circle, Code2, LogOut, Paintbrush } from "lucide-react";
+import { ArrowRight, Bell, BookOpen, Building2, CheckCircle2, Circle, Code2, LogOut, Paintbrush } from "lucide-react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const orgsRef = (api as any).orgs;
@@ -87,8 +87,8 @@ export default function SettingsPage() {
   const slackConfigured = Boolean(orgData?.slackWebhookUrl);
 
   return (
-    <div className="flex flex-col gap-8 p-8 max-w-2xl">
-      {/* Header */}
+    <div className="flex flex-col gap-6 p-8 max-w-5xl">
+      {/* ROW 1: Header */}
       <div>
         <h1 className="text-2xl font-semibold text-zinc-900">Settings</h1>
         <p className="mt-1 text-sm text-zinc-500">
@@ -96,7 +96,7 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      {/* Organization card */}
+      {/* ROW 2: Organization info — full width */}
       <Card className="shadow-none">
         <CardHeader className="border-b px-6 py-4">
           <CardTitle className="flex items-center gap-2 text-base font-semibold text-zinc-900">
@@ -104,7 +104,7 @@ export default function SettingsPage() {
             Organization
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-6 py-5 flex flex-col gap-6">
+        <CardContent className="px-6 py-5">
           <div className="grid grid-cols-2 gap-x-8 gap-y-5">
             <div className="flex flex-col gap-1">
               <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">
@@ -143,122 +143,135 @@ export default function SettingsPage() {
               </div>
             </div>
           </div>
-
-          {/* Slack webhook */}
-          <Separator />
-          <form onSubmit={handleSaveSlack} className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="slack-webhook" className="text-sm font-medium text-zinc-700">
-                Slack webhook URL
-              </Label>
-              {slackConfigured ? (
-                <span className="flex items-center gap-1 text-xs text-emerald-600 font-medium">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  Configured
-                </span>
-              ) : (
-                <span className="flex items-center gap-1 text-xs text-zinc-400">
-                  <Circle className="h-3.5 w-3.5" />
-                  Not configured
-                </span>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <Input
-                id="slack-webhook"
-                placeholder="https://hooks.slack.com/services/..."
-                value={slackInput}
-                onChange={(e) => setSlackInput(e.target.value)}
-                disabled={isSavingSlack}
-                className="flex-1 text-sm"
-              />
-              <Button
-                type="submit"
-                size="sm"
-                disabled={isSavingSlack || !slackInput.trim()}
-                className="shrink-0"
-              >
-                {isSavingSlack ? "Saving…" : "Save"}
-              </Button>
-            </div>
-            <p className="text-xs text-zinc-400">
-              Get this from your Slack app&apos;s Incoming Webhooks page. A
-              notification is sent each time a ticket is triaged.
-            </p>
-          </form>
         </CardContent>
       </Card>
 
-      {/* Branding card */}
-      <Card className="shadow-none">
-        <CardHeader className="border-b px-6 py-4">
-          <CardTitle className="flex items-center gap-2 text-base font-semibold text-zinc-900">
-            <Paintbrush className="h-4 w-4 text-zinc-400" />
-            Submission page branding
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="px-6 py-5">
-          <form onSubmit={handleSaveBranding} className="flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="brand-name" className="text-sm font-medium text-zinc-700">
-                  Brand name
+      {/* ROW 3: Slack + Branding — two columns */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Slack card */}
+        <Card className="shadow-none">
+          <CardHeader className="border-b px-6 py-4">
+            <CardTitle className="flex items-center gap-2 text-base font-semibold text-zinc-900">
+              <Bell className="h-4 w-4 text-zinc-400" />
+              Slack notifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-6 py-5">
+            <form onSubmit={handleSaveSlack} className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="slack-webhook" className="text-sm font-medium text-zinc-700">
+                  Slack webhook URL
                 </Label>
+                {slackConfigured ? (
+                  <span className="flex items-center gap-1 text-xs text-emerald-600 font-medium">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    Configured
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-xs text-zinc-400">
+                    <Circle className="h-3.5 w-3.5" />
+                    Not configured
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-2">
                 <Input
-                  id="brand-name"
-                  placeholder={org?.orgName ?? "Your brand name"}
-                  value={brandNameInput}
-                  onChange={(e) => setBrandNameInput(e.target.value)}
-                  disabled={isSavingBranding}
-                  className="text-sm"
+                  id="slack-webhook"
+                  placeholder="https://hooks.slack.com/services/..."
+                  value={slackInput}
+                  onChange={(e) => setSlackInput(e.target.value)}
+                  disabled={isSavingSlack}
+                  className="flex-1 text-sm"
                 />
-                {orgData?.brandName && (
-                  <span className="text-xs text-zinc-500">
-                    Current: <span className="font-medium">{orgData.brandName}</span>
-                  </span>
-                )}
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={isSavingSlack || !slackInput.trim()}
+                  className="shrink-0"
+                >
+                  {isSavingSlack ? "Saving…" : "Save"}
+                </Button>
               </div>
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="brand-color" className="text-sm font-medium text-zinc-700">
-                  Brand color
-                </Label>
-                <div className="flex gap-2 items-center">
-                  <input
-                    id="brand-color"
-                    type="color"
-                    value={brandColorInput}
-                    onChange={(e) => setBrandColorInput(e.target.value)}
-                    disabled={isSavingBranding}
-                    className="h-9 w-14 cursor-pointer rounded border border-zinc-200 p-0.5"
-                  />
-                  <span className="font-mono text-xs text-zinc-500">{brandColorInput}</span>
-                </div>
-                {orgData?.brandColor && (
-                  <span className="text-xs text-zinc-500">
-                    Current:{" "}
-                    <span
-                      className="inline-block h-3 w-3 rounded-full border border-zinc-200 align-middle"
-                      style={{ backgroundColor: orgData.brandColor }}
-                    />{" "}
-                    <span className="font-mono">{orgData.brandColor}</span>
-                  </span>
-                )}
-              </div>
-            </div>
-            <p className="text-xs text-zinc-400">
-              Your customers will see this on your{" "}
-              <code className="font-mono">/submit/[orgCode]</code> page.
-            </p>
-            <div>
-              <Button type="submit" size="sm" disabled={isSavingBranding}>
-                {isSavingBranding ? "Saving…" : "Save branding"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              <p className="text-xs text-zinc-400">
+                Get this from your Slack app&apos;s Incoming Webhooks page. A
+                notification is sent each time a ticket is triaged.
+              </p>
+            </form>
+          </CardContent>
+        </Card>
 
-      {/* Knowledge base + Developer — side by side */}
+        {/* Branding card */}
+        <Card className="shadow-none">
+          <CardHeader className="border-b px-6 py-4">
+            <CardTitle className="flex items-center gap-2 text-base font-semibold text-zinc-900">
+              <Paintbrush className="h-4 w-4 text-zinc-400" />
+              Submission page branding
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-6 py-5">
+            <form onSubmit={handleSaveBranding} className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="brand-name" className="text-sm font-medium text-zinc-700">
+                    Brand name
+                  </Label>
+                  <Input
+                    id="brand-name"
+                    placeholder={org?.orgName ?? "Your brand name"}
+                    value={brandNameInput}
+                    onChange={(e) => setBrandNameInput(e.target.value)}
+                    disabled={isSavingBranding}
+                    className="text-sm"
+                  />
+                  {orgData?.brandName && (
+                    <span className="text-xs text-zinc-500">
+                      Current: <span className="font-medium">{orgData.brandName}</span>
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="brand-color" className="text-sm font-medium text-zinc-700">
+                    Brand color
+                  </Label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      title="Choose your brand color"
+                      id="brand-color"
+                      type="color"
+                      value={brandColorInput}
+                      onChange={(e) => setBrandColorInput(e.target.value)}
+                      disabled={isSavingBranding}
+                      className="h-9 w-14 cursor-pointer rounded border border-zinc-200 p-0.5"
+                    />
+                    <span className="font-mono text-xs text-zinc-500">{brandColorInput}</span>
+                  </div>
+                  {orgData?.brandColor && (
+                    <span className="text-xs text-zinc-500">
+                      Current:{" "}
+                      <span
+                        className="inline-block h-3 w-3 rounded-full border border-zinc-200 align-middle"
+                        style={{ backgroundColor: orgData.brandColor }}
+                      />{" "}
+                      <span className="font-mono">{orgData.brandColor}</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+              <p className="text-xs text-zinc-400">
+                Your customers will see this on your{" "}
+                <code className="font-mono">/submit/[orgCode]</code> page.
+              </p>
+              <div>
+                <Button type="submit" size="sm" disabled={isSavingBranding}>
+                  {isSavingBranding ? "Saving…" : "Save branding"}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ROW 4: Knowledge Base + Developer — two columns */}
       <div className="grid grid-cols-2 gap-4">
         <Card className="shadow-none">
           <CardHeader className="border-b px-6 py-4">
@@ -305,9 +318,9 @@ export default function SettingsPage() {
         </Card>
       </div>
 
+      {/* ROW 5: Separator + Sign out */}
       <Separator />
 
-      {/* Sign out */}
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-zinc-900">Sign out</p>
