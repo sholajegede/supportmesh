@@ -478,15 +478,27 @@ export default async function HomePage() {
               stack was missing
             </h2>
             <p className="text-base text-zinc-400">Free to start. No credit card required.</p>
-            <LoginLink>
-              <Button
-                size="lg"
-                className="h-12 gap-2 bg-white px-8 text-zinc-950 hover:bg-zinc-100 font-semibold"
-              >
-                Get started free
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </LoginLink>
+            {authed ? (
+              <Link href="/dashboard">
+                <Button
+                  size="lg"
+                  className="h-12 gap-2 bg-white px-8 text-zinc-950 hover:bg-zinc-100 font-semibold"
+                >
+                  Go to Dashboard
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            ) : (
+              <LoginLink>
+                <Button
+                  size="lg"
+                  className="h-12 gap-2 bg-white px-8 text-zinc-950 hover:bg-zinc-100 font-semibold"
+                >
+                  Get started free
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </LoginLink>
+            )}
             <div className="flex flex-wrap items-center justify-center gap-5 text-xs text-zinc-500">
               <span>✓ Free to start</span>
               <span>✓ No credit card</span>
