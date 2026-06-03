@@ -116,7 +116,7 @@ export default function HomePage() {
 
           {/* Dashboard mockup */}
           <div className="relative mx-auto mt-16 w-full max-w-4xl">
-            <div className="relative rounded-t-xl border border-b-0 border-white/10 bg-zinc-900/80 overflow-hidden shadow-2xl">
+            <div className="relative rounded-t-xl border border-b border-white/10 border-b-zinc-800 bg-zinc-900/80 overflow-hidden shadow-2xl">
               <div className="flex h-[280px] sm:h-[320px]">
                 {/* Mock sidebar */}
                 <div className="hidden sm:flex w-44 shrink-0 flex-col gap-1 border-r border-white/10 px-3 py-4">
@@ -180,8 +180,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Gradient bleed */}
-            <div className="pointer-events-none h-20 bg-gradient-to-b from-zinc-950 to-white" />
           </div>
         </section>
 
@@ -234,7 +232,7 @@ export default function HomePage() {
                   icon: MessageSquare,
                   title: "AI draft responses",
                   label: "Informed by your knowledge base",
-                  body: "Claude drafts a professional reply for every ticket, informed by your organisation's knowledge base. Edit and send, or send as-is.",
+                  body: "Claude drafts a professional reply for every ticket, informed by your Organization's knowledge base. Edit and send, or send as-is.",
                 },
                 {
                   icon: Bell,
@@ -329,7 +327,7 @@ export default function HomePage() {
                   title: "Web form",
                   badge: "No auth",
                   badgeCls: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-                  desc: "/submit/[orgCode] — share with customers. White-label with your organisation's name.",
+                  desc: "/submit/[orgCode] — share with customers. White-label with your Organization's name.",
                   code: "/submit/org_yourcode",
                 },
                 {
@@ -414,10 +412,10 @@ export default function HomePage() {
                 {
                   name: "Kinde",
                   role: "Auth and multi-tenancy",
-                  desc: "Every organisation is isolated via a JWT org_code claim. No organisation ever sees another's data. Authentication, user management, and tenant isolation in one SDK.",
+                  desc: "Every Organization is isolated via a JWT org_code claim. No Organization ever sees another's data. Authentication, user management, and tenant isolation in one SDK.",
                   href: "https://kinde.com",
                   linkLabel: "kinde.com",
-                  imgSrc: "/kinde-logo.avif",
+                  imgSrc: "/kinde-logo.png",
                   unoptimized: false,
                 },
                 {
@@ -435,7 +433,7 @@ export default function HomePage() {
                   className="flex flex-col gap-4 rounded-xl border border-zinc-100 bg-zinc-50 p-6"
                 >
                   <div className="flex items-center gap-3">
-                    <Image src={imgSrc} alt={name} width={40} height={40} className="rounded-xl" unoptimized={unoptimized} />
+                    <Image src={imgSrc} alt={name} width={40} height={40} className="rounded-sm" unoptimized={unoptimized} />
                     <div>
                       <p className="text-sm font-semibold text-zinc-900">{name}</p>
                       <p className="text-xs text-zinc-500">{role}</p>
