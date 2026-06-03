@@ -110,15 +110,27 @@ export default async function HomePage() {
             </p>
 
             <div className="flex items-center gap-3 flex-wrap justify-center">
-              <LoginLink>
-                <Button
-                  size="lg"
-                  className="gap-2 bg-white text-zinc-950 hover:bg-zinc-100 h-11 px-6 font-semibold"
-                >
-                  Get started
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </LoginLink>
+              {authed ? (
+                <Link href="/dashboard">
+                  <Button
+                    size="lg"
+                    className="gap-2 bg-white text-zinc-950 hover:bg-zinc-100 h-11 px-6 font-semibold"
+                  >
+                    Go to Dashboard
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              ) : (
+                <LoginLink>
+                  <Button
+                    size="lg"
+                    className="gap-2 bg-white text-zinc-950 hover:bg-zinc-100 h-11 px-6 font-semibold"
+                  >
+                    Get started
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </LoginLink>
+              )}
               <Button
                 asChild
                 size="lg"
