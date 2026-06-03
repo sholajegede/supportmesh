@@ -89,7 +89,7 @@ To generate a key: log into the dashboard, go to Settings → API Keys, click **
 
 5. **Configure the Kinde webhook**
 
-   In your Kinde dashboard, add a webhook pointing to your Convex HTTP endpoint:
+   In your Kinde dashboard, add a webhook pointing to your Convex HTTP actions endpoint. The base URL is your `NEXT_PUBLIC_CONVEX_SITE_URL`:
 
    ```
    https://<your-deployment>.convex.site/kinde
@@ -109,17 +109,13 @@ To generate a key: log into the dashboard, go to Settings → API Keys, click **
 
 | Variable | Required | Description |
 |---|---|---|
-| `KINDE_CLIENT_ID` | ✅ | Kinde OAuth app client ID — found in your Kinde dashboard under Applications |
-| `KINDE_CLIENT_SECRET` | ✅ | Kinde OAuth app client secret |
-| `KINDE_ISSUER_URL` | ✅ | Your Kinde tenant domain (e.g. `https://myapp.kinde.com`) |
-| `KINDE_SITE_URL` | ✅ | URL of this Next.js app — use `http://localhost:3000` for local dev |
-| `KINDE_POST_LOGOUT_REDIRECT_URL` | ✅ | Where Kinde redirects after logout |
-| `KINDE_POST_LOGIN_REDIRECT_URL` | ✅ | Where Kinde redirects after a successful login |
-| `KINDE_DOMAIN` | ✅ | Your Kinde tenant domain — used by the Mastra auth integration |
-| `ANTHROPIC_API_KEY` | ✅ | Anthropic API key for the Mastra AI agents |
+| `KINDE_ISSUER_URL` | ✅ | Your Kinde tenant domain (e.g. `https://myapp.kinde.com`) — used to construct the JWKS URL for verifying Kinde webhook JWTs |
+| `KINDE_DOMAIN` | ✅ | Your Kinde tenant domain — same value as `KINDE_ISSUER_URL`, used by the Mastra auth integration |
 | `NEXT_PUBLIC_CONVEX_URL` | ✅ | Convex deployment URL — written automatically by `npx convex dev` |
+| `NEXT_PUBLIC_CONVEX_SITE_URL` | ✅ | Convex HTTP actions URL (e.g. `https://your-deployment.convex.site`) — the base for the Kinde webhook endpoint at `/kinde` |
+| `CONVEX_DEPLOYMENT` | — | Set automatically by `npx convex deploy` and `npx convex dev`; do not fill in manually |
 | `RESEND_API_KEY` | ⬜ | Resend API key for sending email responses to customers |
-| `NEXT_PUBLIC_URL` | ⬜ | Public URL of this app — used for metadata and OG tags (defaults to `http://localhost:3000`) |
+| `NEXT_PUBLIC_URL` | ⬜ | Public URL of this app — used as the base URL for metadata and OG tags (defaults to `http://localhost:3000`) |
 
 ## Submitting tickets
 

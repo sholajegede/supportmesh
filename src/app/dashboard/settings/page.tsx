@@ -22,7 +22,7 @@ export default function SettingsPage() {
   );
 
   return (
-    <div className="flex flex-col gap-8 p-8 max-w-2xl">
+    <div className="flex flex-col gap-8 p-8 max-w-3xl">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold text-zinc-900">Settings</h1>
@@ -36,25 +36,31 @@ export default function SettingsPage() {
         <CardHeader className="border-b px-6 py-4">
           <CardTitle className="flex items-center gap-2 text-base font-semibold text-zinc-900">
             <Building2 className="h-4 w-4 text-zinc-400" />
-            Organization Settings
+            Organization
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-6 py-5 flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-6">
+        <CardContent className="px-6 py-5">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-5">
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">Org Name</span>
+              <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+                Org Name
+              </span>
               <span className="text-sm font-medium text-zinc-800">
                 {org?.orgName ?? "—"}
               </span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">Org Code</span>
+              <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+                Org Code
+              </span>
               <span className="font-mono text-sm text-zinc-600">
                 {org?.orgCode ?? "—"}
               </span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">Account Owner</span>
+              <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+                Account Owner
+              </span>
               <span className="text-sm text-zinc-800">
                 {user?.given_name && user?.family_name
                   ? `${user.given_name} ${user.family_name}`
@@ -62,60 +68,65 @@ export default function SettingsPage() {
               </span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">Plan</span>
+              <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+                Plan
+              </span>
               <div>
-                <Badge className="bg-zinc-900 text-white hover:bg-zinc-800 text-xs">Pro</Badge>
+                <Badge className="bg-zinc-900 text-white hover:bg-zinc-800 text-xs">
+                  Pro
+                </Badge>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Knowledge base summary */}
-      <Card className="shadow-none">
-        <CardHeader className="border-b px-6 py-4">
-          <CardTitle className="flex items-center gap-2 text-base font-semibold text-zinc-900">
-            <BookOpen className="h-4 w-4 text-zinc-400" />
-            Knowledge Base
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="px-6 py-5 flex items-center justify-between">
-          <p className="text-sm text-zinc-600">
-            {knowledge === undefined
-              ? "Loading…"
-              : `${knowledge.length} ${knowledge.length === 1 ? "entry" : "entries"} in your knowledge base`}
-          </p>
-          <Link
-            href="/dashboard/knowledge"
-            className="inline-flex items-center gap-1 text-sm font-medium text-zinc-800 hover:text-zinc-600 transition-colors"
-          >
-            Manage Knowledge Base
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </CardContent>
-      </Card>
+      {/* Knowledge base + Developer — side by side */}
+      <div className="grid grid-cols-2 gap-4">
+        <Card className="shadow-none">
+          <CardHeader className="border-b px-6 py-4">
+            <CardTitle className="flex items-center gap-2 text-base font-semibold text-zinc-900">
+              <BookOpen className="h-4 w-4 text-zinc-400" />
+              Knowledge Base
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-6 py-5 flex flex-col gap-4">
+            <p className="text-sm text-zinc-600">
+              {knowledge === undefined
+                ? "Loading…"
+                : `${knowledge.length} ${knowledge.length === 1 ? "entry" : "entries"} in your knowledge base`}
+            </p>
+            <Link
+              href="/dashboard/knowledge"
+              className="inline-flex items-center gap-1 text-sm font-medium text-zinc-800 hover:text-zinc-600 transition-colors"
+            >
+              Manage
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </CardContent>
+        </Card>
 
-      {/* Developer */}
-      <Card className="shadow-none">
-        <CardHeader className="border-b px-6 py-4">
-          <CardTitle className="flex items-center gap-2 text-base font-semibold text-zinc-900">
-            <Code2 className="h-4 w-4 text-zinc-400" />
-            Developer
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="px-6 py-5 flex items-center justify-between">
-          <p className="text-sm text-zinc-600">
-            Manage API keys and view REST API and MCP server documentation.
-          </p>
-          <Link
-            href="/dashboard/developer"
-            className="inline-flex items-center gap-1 text-sm font-medium text-zinc-800 hover:text-zinc-600 transition-colors shrink-0 ml-4"
-          >
-            Developer settings
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </CardContent>
-      </Card>
+        <Card className="shadow-none">
+          <CardHeader className="border-b px-6 py-4">
+            <CardTitle className="flex items-center gap-2 text-base font-semibold text-zinc-900">
+              <Code2 className="h-4 w-4 text-zinc-400" />
+              Developer
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-6 py-5 flex flex-col gap-4">
+            <p className="text-sm text-zinc-600">
+              Manage API keys, REST API, and MCP server docs.
+            </p>
+            <Link
+              href="/dashboard/developer"
+              className="inline-flex items-center gap-1 text-sm font-medium text-zinc-800 hover:text-zinc-600 transition-colors"
+            >
+              Developer settings
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
 
       <Separator />
 
@@ -123,10 +134,15 @@ export default function SettingsPage() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-zinc-900">Sign out</p>
-          <p className="text-xs text-zinc-500">You will be redirected to the login page.</p>
+          <p className="text-xs text-zinc-500">
+            You will be redirected to the login page.
+          </p>
         </div>
         <LogoutLink>
-          <Button variant="outline" className="gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700">
+          <Button
+            variant="outline"
+            className="gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+          >
             <LogOut className="h-4 w-4" />
             Log out
           </Button>
