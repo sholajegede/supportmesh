@@ -199,7 +199,38 @@ Authorization: Bearer <YOUR_ORG_API_KEY>
 }
 ```
 
-Generate your API key from Dashboard → Settings → API Keys. The key is bound to your Organization — no `orgCode` needed in the request body.
+Generate your API key from Dashboard → Developer → API Keys. The key is bound to your Organization — no `orgCode` needed in the request body.
+
+**REST API** — retrieve all tickets for your org:
+
+```http
+GET /api/v1/tickets
+Authorization: Bearer <YOUR_ORG_API_KEY>
+```
+
+Returns:
+
+```json
+{
+  "tickets": [
+    {
+      "_id": "...",
+      "subject": "Cannot log in to my account",
+      "body": "I've been locked out since yesterday...",
+      "customerEmail": "customer@example.com",
+      "category": "account",
+      "priority": "high",
+      "sentiment": "frustrated",
+      "status": "open",
+      "draftResponse": "...",
+      "escalationReason": null,
+      "_creationTime": 1234567890000
+    }
+  ]
+}
+```
+
+Tickets are returned in descending order by creation time. The org is derived from your API key — no `orgCode` needed in the request.
 
 **MCP server** — for AI agents and agent workflows:
 
