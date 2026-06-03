@@ -29,6 +29,7 @@ export default defineSchema({
     orgCode: v.string(),
     title: v.string(),
     content: v.string(),
+    category: v.optional(v.string()),
   }).index("by_orgCode", ["orgCode"]),
 
   summaries: defineTable({

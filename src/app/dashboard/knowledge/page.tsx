@@ -65,6 +65,29 @@ export default function KnowledgePage() {
   // Search state
   const [search, setSearch] = useState("");
 
+  // Category filter state
+  const [activeCategory, setActiveCategory] = useState("all");
+
+  const categories = [
+    "all",
+    "getting-started",
+    "triage",
+    "workflow",
+    "knowledge-base",
+    "summaries",
+    "notifications",
+    "api",
+    "mcp",
+    "security",
+    "branding",
+    "troubleshooting",
+  ];
+
+  function categoryLabel(c: string) {
+    if (c === "all") return "All";
+    return c.charAt(0).toUpperCase() + c.slice(1).replace(/-/g, " ");
+  }
+
   async function handleAddEntry(e: React.FormEvent) {
     e.preventDefault();
     if (!orgCode) return;
@@ -118,13 +141,18 @@ export default function KnowledgePage() {
   }
 
   const filtered = knowledge
-    ? search.trim()
-      ? knowledge.filter(
-          (e) =>
-            e.title.toLowerCase().includes(search.toLowerCase()) ||
-            e.content.toLowerCase().includes(search.toLowerCase())
+    ? knowledge
+        .filter((e) =>
+          activeCategory === "all"
+            ? true
+            : (e as { category?: string }).category === activeCategory
         )
-      : knowledge
+        .filter((e) =>
+          search.trim()
+            ? e.title.toLowerCase().includes(search.toLowerCase()) ||
+              e.content.toLowerCase().includes(search.toLowerCase())
+            : true
+        )
     : [];
 
   return (
@@ -226,6 +254,7 @@ export default function KnowledgePage() {
           />
           {search && (
             <button
+              title="Clear search"
               type="button"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
               onClick={() => setSearch("")}
@@ -233,6 +262,26 @@ export default function KnowledgePage() {
               <X className="h-4 w-4" />
             </button>
           )}
+        </div>
+      )}
+
+      {/* Category filter pills */}
+      {knowledge !== undefined && knowledge.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {categories.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setActiveCategory(c)}
+              className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                activeCategory === c
+                  ? "bg-zinc-900 text-white"
+                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+              }`}
+            >
+              {categoryLabel(c)}
+            </button>
+          ))}
         </div>
       )}
 
@@ -335,6 +384,11 @@ export default function KnowledgePage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex flex-col gap-2 min-w-0 flex-1">
                       <h3 className="text-base font-semibold text-zinc-900">{entry.title}</h3>
+                      {(entry as { category?: string }).category && (
+                        <span className="w-fit rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500">
+                          {categoryLabel((entry as { category?: string }).category!)}
+                        </span>
+                      )}
                       <p className="text-sm leading-relaxed text-zinc-600 whitespace-pre-wrap">
                         {entry.content}
                       </p>
