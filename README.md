@@ -4,7 +4,9 @@ AI-powered support operations platform with multi-tenant isolation.
 
 ## What it is
 
-SupportMesh automates the repetitive work of a support queue. When a ticket arrives — via web form, REST API, or MCP tool call — a Mastra triage agent running Claude Haiku classifies it by category and priority, scores the customer's sentiment, searches your Organization's knowledge base, drafts a response under 150 words, and checks whether the ticket needs escalating. The result lands in your dashboard in seconds, ready for a human to review, edit, and send.
+SupportMesh is support infrastructure for teams where tickets come from AI agents and automated systems, not just people typing into forms. A Mastra triage agent running Claude Haiku processes every ticket the moment it arrives -- via web form, REST API, or MCP tool call -- classifying it by category and priority, scoring customer sentiment, searching the organisation's knowledge base, drafting a response, and checking whether the ticket needs escalating. The result is in the dashboard in seconds.
+
+The platform is built for teams where CI pipelines, monitoring agents, and AI coding assistants are first-class ticket sources. Every submission channel is authenticated and org-scoped: the customer web form validates the org in the URL, the REST API derives the org from a per-org API key, and the MCP server binds the authenticated orgCode to every tool call so callers cannot access another organisation's data.
 
 The platform is built for teams that run multiple products or customer segments under one account. Every piece of data — tickets, knowledge base entries, daily summaries, and users — is scoped to a Kinde Organization code (`org_code`). Agents receive that code in the request, pass it through every tool call, and Convex enforces it at the query level, so no Organization can ever read another's data.
 
@@ -37,8 +39,11 @@ What makes SupportMesh technically interesting is the combination of pieces: Mas
 - **MCP server** at `/api/mcp` — exposes `submit_ticket`, `get_org_tickets`, and `get_ticket` tools for AI agent consumption via the Model Context Protocol
 - **Daily summary agent** — on demand, fetches all org tickets, counts by status, identifies the top categories, determines overall sentiment, and surfaces long-running (open / in-progress) tickets
 - **Knowledge base CRUD** — per-org entries that the triage agent searches when drafting responses; managed from the dashboard
+- **Knowledge base seeding** — a seed mutation ships with the repo; run `npx convex run seed:seedKnowledgeBase '{"orgCode":"your_code"}'` to populate 30 categorised production-quality entries covering triage, API usage, Slack setup, MCP configuration, billing, troubleshooting, and branding
+- **Knowledge base categories** — entries are tagged by category (getting-started, triage, workflow, api, mcp, notifications, security, branding, troubleshooting); the knowledge base page shows a category filter row
 - **Resend email integration** — send AI-drafted responses directly to the customer's email from the ticket detail view
-- **Per-org API keys** — each organisation generates their own API keys from the dashboard; keys are cryptographically bound to the org server-side, so callers cannot access another org's data even with a valid key
+- **Per-org API keys** — each Organization generates their own API keys from the dashboard; keys are cryptographically bound to the org server-side, so callers cannot access another org's data even with a valid key
+- **Developer page** — `/dashboard/developer` provides full API documentation including curl examples, MCP connection config for Claude Desktop and Claude Code, available tool schemas, and the customer submission URL for the authenticated org
 
 ## Architecture
 
@@ -52,17 +57,31 @@ To generate a key: log into the dashboard, go to **Developer**, click **Generate
 
 ## Slack notifications
 
-Each organisation can configure a Slack Incoming Webhook to receive a notification every time a ticket is triaged. The notification includes the ticket subject, priority, sentiment, the customer's email address, and a button that links directly to the ticket in the dashboard.
+Each Organization can configure a Slack Incoming Webhook to receive a notification every time a ticket is triaged. The notification includes the ticket subject, priority, sentiment, the customer's email address, and a button that links directly to the ticket in the dashboard.
 
 To configure: go to **Settings**, paste your Incoming Webhook URL into the **Slack webhook URL** field, and click **Save**. Get the URL from your Slack app's Incoming Webhooks page at `api.slack.com/apps`.
 
 ## Customer profiles
 
-The **Customers** section of the dashboard lists every unique customer email that has submitted a ticket to your organisation, along with the total number of tickets and the date of their most recent submission. Clicking a customer opens a filtered view of all their tickets.
+The **Customers** section of the dashboard lists every unique customer email that has submitted a ticket to your Organization, along with the total number of tickets and the date of their most recent submission. Clicking a customer opens a filtered view of all their tickets.
 
 ## White-label branding
 
-The customer submission page at `/submit/[orgCode]` can be customised per organisation. From **Settings → Submission page branding**, set a **Brand name** (shown as the page header instead of "SupportMesh") and a **Brand color** (applied to the logo background and the submit button). Customers see your brand, not SupportMesh's.
+The customer submission page at `/submit/[orgCode]` can be customised per Organization. From **Settings → Submission page branding**, set a **Brand name** (shown as the page header instead of "SupportMesh") and a **Brand color** (applied to the logo background and the submit button). Customers see your brand, not SupportMesh's.
+
+## Knowledge base
+
+The knowledge base is the primary way to improve AI draft response quality. Every knowledge base entry you add is searched each time a ticket arrives. Entries that match the ticket subject inform the draft response.
+
+Entries are organised by category: getting-started, triage, workflow, api, mcp, notifications, security, branding, and troubleshooting. The knowledge base page in the dashboard shows a category filter so you can browse entries by topic.
+
+To seed 30 production-quality sample entries covering all categories:
+
+```bash
+npx convex run seed:seedKnowledgeBase '{"orgCode":"your_org_code"}'
+```
+
+The seed is idempotent. Running it on an org that already has more than 5 entries will skip without inserting anything.
 
 ## Getting started
 
@@ -127,6 +146,16 @@ The customer submission page at `/submit/[orgCode]` can be customised per organi
 
    The app will be running at [http://localhost:3000](http://localhost:3000).
 
+7. **Seed the knowledge base (optional)**
+
+   Populate your org's knowledge base with 30 sample entries covering common support topics:
+
+   ```bash
+   npx convex run seed:seedKnowledgeBase '{"orgCode":"your_org_code"}'
+   ```
+
+   Replace `your_org_code` with your actual org code from Settings. The seed will skip if the org already has more than 5 entries.
+
 ### Environment variables
 
 | Variable | Required | Description |
@@ -186,7 +215,7 @@ The MCP server exposes three tools:
 | `get_org_tickets` | List all tickets for an Organization |
 | `get_ticket` | Fetch a single ticket by ID |
 
-**Authentication:** include your API key as `Authorization: Bearer sm_yourkey` on all POST requests to `/api/mcp`. Generate keys from Dashboard → Settings → API Keys.
+**Authentication:** include your API key as `Authorization: Bearer sm_yourkey` on all POST requests to `/api/mcp`. Generate keys from Dashboard → Developer → API Keys.
 
 ## Deploying
 
