@@ -115,11 +115,11 @@ To generate a key: log into the dashboard, go to Settings → API Keys, click **
 | `KINDE_SITE_URL` | ✅ | URL of this Next.js app — use `http://localhost:3000` for local dev |
 | `KINDE_POST_LOGOUT_REDIRECT_URL` | ✅ | Where Kinde redirects after logout |
 | `KINDE_POST_LOGIN_REDIRECT_URL` | ✅ | Where Kinde redirects after a successful login |
-| `KINDE_DOMAIN` | ✅ | Same value as `KINDE_ISSUER_URL` — used by the Kinde management API client |
-| `KINDE_AUDIENCE` | ✅ | Kinde API audience — found in your Kinde dashboard under APIs |
+| `KINDE_DOMAIN` | ✅ | Your Kinde tenant domain — used by the Mastra auth integration |
 | `ANTHROPIC_API_KEY` | ✅ | Anthropic API key for the Mastra AI agents |
 | `NEXT_PUBLIC_CONVEX_URL` | ✅ | Convex deployment URL — written automatically by `npx convex dev` |
 | `RESEND_API_KEY` | ⬜ | Resend API key for sending email responses to customers |
+| `NEXT_PUBLIC_URL` | ⬜ | Public URL of this app — used for metadata and OG tags (defaults to `http://localhost:3000`) |
 
 ## Submitting tickets
 
