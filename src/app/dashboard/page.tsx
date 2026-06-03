@@ -113,7 +113,7 @@ export default function DashboardPage() {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ orgCode, date }),
+        body: JSON.stringify({ date }),
       });
       if (!res.ok) throw new Error("Request failed");
       const data = await res.json();
