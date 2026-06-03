@@ -10,6 +10,8 @@ import { Zap, Loader2, CheckCircle2 } from "lucide-react";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
+const isValidOrgCode = (code: string) => /^org_[a-zA-Z0-9]+$/.test(code);
+
 export default function SubmitTicketPage() {
   const params = useParams<{ orgCode: string }>();
   const orgCode = params?.orgCode ?? "";
@@ -57,6 +59,30 @@ export default function SubmitTicketPage() {
     setMessage("");
     setErrorMsg("");
     setSubmittedEmail("");
+  }
+
+  if (!orgCode || !isValidOrgCode(orgCode)) {
+    return (
+      <div className="min-h-screen bg-background flex items-start justify-center px-4 pt-16 pb-12">
+        <div className="w-full max-w-lg">
+          <div className="flex items-center gap-2.5 mb-8">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900">
+              <Zap className="h-4 w-4 text-white" />
+            </div>
+            <span className="text-lg font-semibold tracking-tight text-zinc-900">
+              SupportMesh
+            </span>
+          </div>
+          <div className="flex flex-col items-center text-center gap-4 py-8">
+            <h1 className="text-2xl font-semibold text-zinc-900">Invalid submission link</h1>
+            <p className="text-sm text-zinc-500 leading-relaxed max-w-sm">
+              This support link is not valid. Please contact the company that sent
+              you here to get the correct link.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
