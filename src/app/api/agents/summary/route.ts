@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { summaryAgent } from "@/lib/mastra/agents/summary-agent";
+import { validateKindeToken } from "@/lib/mastra/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -14,15 +15,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const { orgCode, date } = body;
-
-    if (!orgCode || !date) {
+    // Validate the Kinde JWT and extract org_code from the token.
+    // The orgCode is never trusted from the request body.
+    const identity = await validateKindeToken(token);
+    if (!identity) {
       return NextResponse.json(
-        { error: "Missing required fields: orgCode, date" },
+        { error: "Invalid or expired token" },
+        { status: 401 }
+      );
+    }
+
+    const body = await req.json();
+    const { date } = body;
+
+    if (!date) {
+      return NextResponse.json(
+        { error: "Missing required field: date" },
         { status: 400 }
       );
     }
+
+    // orgCode comes from the verified JWT, not the request body
+    const { orgCode } = identity;
 
     const result = await summaryAgent.generate(
       `Generate the daily summary for org ${orgCode} on ${date}`
