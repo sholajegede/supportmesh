@@ -1,10 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Bell, MessageSquare, Zap } from "lucide-react";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { isAuthenticated } = getKindeServerSession();
+  const authed = await isAuthenticated();
+
   return (
     <>
       <style>{`
@@ -42,15 +46,27 @@ export default function HomePage() {
                 SupportMesh
               </span>
             </div>
-            <LoginLink>
-              <Button
-                size="sm"
-                variant="secondary"
-                className="h-8 px-4 text-xs transition-all duration-200 hover:ring-2 hover:ring-white/30 hover:ring-offset-1 hover:ring-offset-zinc-950"
-              >
-                Sign in
-              </Button>
-            </LoginLink>
+            {authed ? (
+              <Link href="/dashboard">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-8 px-4 text-xs transition-all duration-200 hover:ring-2 hover:ring-white/30 hover:ring-offset-1 hover:ring-offset-zinc-950"
+                >
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <LoginLink>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-8 px-4 text-xs transition-all duration-200 hover:ring-2 hover:ring-white/30 hover:ring-offset-1 hover:ring-offset-zinc-950"
+                >
+                  Sign in
+                </Button>
+              </LoginLink>
+            )}
           </div>
         </header>
 
