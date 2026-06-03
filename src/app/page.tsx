@@ -41,23 +41,15 @@ export default function HomePage() {
                 SupportMesh
               </span>
             </div>
-            <div className="flex items-center gap-5">
-              <Link
-                href="/pricing"
-                className="text-sm text-zinc-400 hover:text-zinc-300 transition-colors"
+            <LoginLink>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="h-8 px-4 text-xs transition-all duration-200 hover:ring-2 hover:ring-white/30 hover:ring-offset-1 hover:ring-offset-zinc-950"
               >
-                Pricing
-              </Link>
-              <LoginLink>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="h-8 px-4 text-xs transition-all duration-200 hover:ring-2 hover:ring-white/30 hover:ring-offset-1 hover:ring-offset-zinc-950"
-                >
-                  Sign in
-                </Button>
-              </LoginLink>
-            </div>
+                Sign in
+              </Button>
+            </LoginLink>
           </div>
         </header>
 
@@ -76,24 +68,12 @@ export default function HomePage() {
           </div>
 
           <div className="relative flex flex-col items-center gap-7 max-w-3xl">
-            {/* Technology pills */}
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              {[
-                { name: "Mastra",    dot: "bg-orange-400" },
-                { name: "Kinde",     dot: "bg-purple-400" },
-                { name: "Convex",    dot: "bg-yellow-400" },
-                { name: "Claude AI", dot: "bg-red-400" },
-              ].map(({ name, dot }) => (
-                <div
-                  key={name}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 backdrop-blur-sm"
-                >
-                  <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
-                  <span className="text-xs font-medium text-white/75 tracking-wide">
-                    {name}
-                  </span>
-                </div>
-              ))}
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-4 py-1.5 backdrop-blur-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span className="text-xs font-medium text-white/75 tracking-wide">
+                Powered by Mastra, Kinde, and Convex
+              </span>
             </div>
 
             {/* Headline */}
@@ -422,8 +402,6 @@ export default function HomePage() {
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
               {[
                 {
-                  initial: "M",
-                  iconBg: "bg-orange-500",
                   name: "Mastra",
                   role: "Agent orchestration",
                   desc: "The triage agent, summary agent, and MCP server are all built on Mastra. It manages the tool loop, handles retries, and keeps the agent context clean.",
@@ -431,8 +409,6 @@ export default function HomePage() {
                   linkLabel: "mastra.ai",
                 },
                 {
-                  initial: "K",
-                  iconBg: "bg-purple-500",
                   name: "Kinde",
                   role: "Auth and multi-tenancy",
                   desc: "Every organisation is isolated via a JWT org_code claim. No organisation ever sees another's data. Authentication, user management, and tenant isolation in one SDK.",
@@ -440,24 +416,20 @@ export default function HomePage() {
                   linkLabel: "kinde.com",
                 },
                 {
-                  initial: "C",
-                  iconBg: "bg-yellow-500",
                   name: "Convex",
                   role: "Real-time database",
                   desc: "Tickets appear in your dashboard the moment the agent processes them. Convex's reactive queries mean no polling, no refresh, and server-side identity verification on every query.",
                   href: "https://convex.dev",
                   linkLabel: "convex.dev",
                 },
-              ].map(({ initial, iconBg, name, role, desc, href, linkLabel }) => (
+              ].map(({ name, role, desc, href, linkLabel }) => (
                 <div
                   key={name}
                   className="flex flex-col gap-4 rounded-xl border border-zinc-100 bg-zinc-50 p-6"
                 >
                   <div className="flex items-center gap-3">
-                    <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold text-white ${iconBg}`}
-                    >
-                      {initial}
+                    <div className="h-10 w-10 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center">
+                      <span className="text-xs text-zinc-400 font-mono">logo</span>
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-zinc-900">{name}</p>
@@ -474,118 +446,6 @@ export default function HomePage() {
                   </Link>
                 </div>
               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Pricing ─────────────────────────────────────────────────────── */}
-        <section className="bg-zinc-50 px-6 py-24">
-          <div className="mx-auto max-w-5xl">
-            <div className="mb-12 text-center">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-400">
-                Pricing
-              </p>
-              <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
-                Simple, transparent pricing
-              </h2>
-              <p className="mt-3 text-base text-zinc-500">Start free. Scale when you need to.</p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-              {/* Free */}
-              <div className="flex flex-col gap-6 rounded-xl border border-zinc-200 bg-white p-6">
-                <div>
-                  <p className="text-sm font-semibold text-zinc-900">Free</p>
-                  <p className="mt-1 text-3xl font-bold text-zinc-900">
-                    $0<span className="text-base font-normal text-zinc-500">/mo</span>
-                  </p>
-                </div>
-                <ul className="flex flex-col gap-2.5 text-sm text-zinc-600">
-                  {[
-                    "1 organisation",
-                    "100 tickets per month",
-                    "AI triage and draft responses",
-                    "Customer submission URL",
-                    "REST API and MCP access",
-                    "1 team member",
-                  ].map((f) => (
-                    <li key={f} className="flex items-start gap-2">
-                      <span className="mt-0.5 text-zinc-400">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <LoginLink>
-                  <Button variant="outline" className="w-full">
-                    Get started
-                  </Button>
-                </LoginLink>
-              </div>
-
-              {/* Pro */}
-              <div className="flex flex-col gap-6 rounded-xl border-2 border-zinc-900 bg-white p-6 relative">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="rounded-full bg-zinc-900 px-3 py-1 text-[11px] font-semibold text-white">
-                    Most popular
-                  </span>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-zinc-900">Pro</p>
-                  <p className="mt-1 text-3xl font-bold text-zinc-900">
-                    $49<span className="text-base font-normal text-zinc-500">/mo</span>
-                  </p>
-                </div>
-                <ul className="flex flex-col gap-2.5 text-sm text-zinc-600">
-                  {[
-                    "Unlimited tickets",
-                    "Slack notifications",
-                    "Team inbox with assignments",
-                    "Customer profiles",
-                    "Knowledge base (unlimited entries)",
-                    "10 team members",
-                    "Priority support",
-                  ].map((f) => (
-                    <li key={f} className="flex items-start gap-2">
-                      <span className="mt-0.5 text-zinc-400">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <LoginLink>
-                  <Button className="w-full bg-zinc-900 text-white hover:bg-zinc-800">
-                    Start free trial
-                  </Button>
-                </LoginLink>
-              </div>
-
-              {/* Enterprise */}
-              <div className="flex flex-col gap-6 rounded-xl border border-zinc-200 bg-white p-6">
-                <div>
-                  <p className="text-sm font-semibold text-zinc-900">Enterprise</p>
-                  <p className="mt-1 text-3xl font-bold text-zinc-900">
-                    Custom
-                  </p>
-                </div>
-                <ul className="flex flex-col gap-2.5 text-sm text-zinc-600">
-                  {[
-                    "Everything in Pro",
-                    "White-label submission page",
-                    "Custom domain",
-                    "SSO and SAML",
-                    "SLA tracking and alerts",
-                    "Dedicated Slack channel",
-                    "Unlimited team members",
-                  ].map((f) => (
-                    <li key={f} className="flex items-start gap-2">
-                      <span className="mt-0.5 text-zinc-400">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Button variant="outline" className="w-full" asChild>
-                  <a href="mailto:hello@supportmesh.app">Contact us</a>
-                </Button>
-              </div>
             </div>
           </div>
         </section>
