@@ -21,7 +21,7 @@ function buildServer(authenticatedOrgCode?: string): McpServer {
     "submit_ticket",
     "Submit a support ticket to be triaged by AI",
     {
-      orgCode:       z.string().describe("Organisation code"),
+      orgCode:       z.string().describe("Organization code"),
       customerEmail: z.string().email().describe("Customer's email address"),
       subject:       z.string().describe("Brief subject line"),
       body:          z.string().describe("Full ticket message body"),
@@ -47,9 +47,9 @@ Message: ${body}`
 
   server.tool(
     "get_org_tickets",
-    "Get all tickets for an organisation",
+    "Get all tickets for an Organization",
     {
-      orgCode: z.string().describe("Organisation code"),
+      orgCode: z.string().describe("Organization code"),
     },
     async ({ orgCode: argOrgCode }) => {
       const orgCode = authenticatedOrgCode ?? argOrgCode;

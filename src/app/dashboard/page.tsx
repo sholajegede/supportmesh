@@ -262,7 +262,7 @@ export default function DashboardPage() {
           <DialogHeader>
             <DialogTitle>Daily Summary — {todayLabel()}</DialogTitle>
             <DialogDescription>
-              AI-generated support operations summary for your organisation.
+              AI-generated support operations summary for your Organization.
             </DialogDescription>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto rounded-md border border-zinc-100 bg-zinc-50 px-4 py-3">

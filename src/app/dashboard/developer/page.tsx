@@ -129,7 +129,7 @@ export default function DeveloperPage() {
 
   return (
     <>
-      <div className="flex flex-col gap-8 p-8 max-w-2xl">
+      <div className="flex flex-col gap-8 p-8">
         {/* Header */}
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900">Developer</h1>
@@ -360,7 +360,7 @@ export default function DeveloperPage() {
                       },
                       {
                         tool: "get_org_tickets",
-                        desc: "List all tickets for your organisation",
+                        desc: "List all tickets for your Organization",
                       },
                       {
                         tool: "get_ticket",

@@ -141,7 +141,7 @@ export default function KnowledgePage() {
             )}
           </div>
           <p className="mt-1 text-sm text-zinc-500">
-            Entries your AI agent uses to draft responses and answer tickets for your organisation.
+            Entries your AI agent uses to draft responses and answer tickets for your Organization.
           </p>
         </div>
         <Button className="gap-2" onClick={() => setShowAdd((v) => !v)}>

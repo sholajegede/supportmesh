@@ -4,9 +4,9 @@ AI-powered support operations platform with multi-tenant isolation.
 
 ## What it is
 
-SupportMesh automates the repetitive work of a support queue. When a ticket arrives — via web form, REST API, or MCP tool call — a Mastra triage agent running Claude Haiku classifies it by category and priority, scores the customer's sentiment, searches your organisation's knowledge base, drafts a response under 150 words, and checks whether the ticket needs escalating. The result lands in your dashboard in seconds, ready for a human to review, edit, and send.
+SupportMesh automates the repetitive work of a support queue. When a ticket arrives — via web form, REST API, or MCP tool call — a Mastra triage agent running Claude Haiku classifies it by category and priority, scores the customer's sentiment, searches your Organization's knowledge base, drafts a response under 150 words, and checks whether the ticket needs escalating. The result lands in your dashboard in seconds, ready for a human to review, edit, and send.
 
-The platform is built for teams that run multiple products or customer segments under one account. Every piece of data — tickets, knowledge base entries, daily summaries, and users — is scoped to a Kinde organisation code (`org_code`). Agents receive that code in the request, pass it through every tool call, and Convex enforces it at the query level, so no organisation can ever read another's data.
+The platform is built for teams that run multiple products or customer segments under one account. Every piece of data — tickets, knowledge base entries, daily summaries, and users — is scoped to a Kinde Organization code (`org_code`). Agents receive that code in the request, pass it through every tool call, and Convex enforces it at the query level, so no Organization can ever read another's data.
 
 What makes SupportMesh technically interesting is the combination of pieces: Mastra orchestrates the agent tool loops, Convex provides real-time reactive data with built-in identity verification, Kinde handles auth and multi-tenancy via JWT claims, and the MCP server at `/api/mcp` exposes ticket operations to external AI agents — so SupportMesh itself can be a tool inside a larger agentic workflow.
 
@@ -17,7 +17,7 @@ What makes SupportMesh technically interesting is the combination of pieces: Mas
 | [Next.js 16](https://nextjs.org) | Full-stack React framework — app router, server components, API routes |
 | [Mastra](https://mastra.ai) | Agent orchestration framework — manages tool loops and agent instructions |
 | [Claude Haiku (`claude-haiku-4-5`)](https://anthropic.com) | LLM powering both the triage and summary agents via the Anthropic API |
-| [Kinde](https://kinde.com) | Authentication, organisation management, and JWT-based multi-tenancy |
+| [Kinde](https://kinde.com) | Authentication, Organization management, and JWT-based multi-tenancy |
 | [Convex](https://convex.dev) | Real-time database with server functions and identity verification |
 | [Resend](https://resend.com) | Transactional email — sends drafted responses to customers |
 | [shadcn/ui](https://ui.shadcn.com) | Component library built on Radix UI and Tailwind CSS |
@@ -34,7 +34,7 @@ What makes SupportMesh technically interesting is the combination of pieces: Mas
 - **Daily summary agent** — on demand, fetches all org tickets, counts by status, identifies the top categories, determines overall sentiment, and surfaces long-running (open / in-progress) tickets
 - **Knowledge base CRUD** — per-org entries that the triage agent searches when drafting responses; managed from the dashboard
 - **Resend email integration** — send AI-drafted responses directly to the customer's email from the ticket detail view
-- **Per-org API keys** — each organisation generates their own API keys from the dashboard; keys are cryptographically bound to the org server-side, so callers cannot access another org's data even with a valid key
+- **Per-org API keys** — each Organization generates their own API keys from the dashboard; keys are cryptographically bound to the org server-side, so callers cannot access another org's data even with a valid key
 
 ## Architecture
 
@@ -109,13 +109,18 @@ To generate a key: log into the dashboard, go to Settings → API Keys, click **
 
 | Variable | Required | Description |
 |---|---|---|
+| `KINDE_CLIENT_ID` | ✅ | Kinde OAuth app client ID — found in your Kinde dashboard under Applications |
+| `KINDE_CLIENT_SECRET` | ✅ | Kinde OAuth app client secret |
 | `KINDE_ISSUER_URL` | ✅ | Your Kinde tenant domain (e.g. `https://myapp.kinde.com`) — used to construct the JWKS URL for verifying Kinde webhook JWTs |
-| `KINDE_DOMAIN` | ✅ | Your Kinde tenant domain — same value as `KINDE_ISSUER_URL`, used by the Mastra auth integration |
+| `KINDE_DOMAIN` | ✅ | Same value as `KINDE_ISSUER_URL` — used by the Mastra auth integration |
+| `KINDE_SITE_URL` | ✅ | URL of this Next.js app — used by the Kinde SDK for OAuth callbacks (use `http://localhost:3000` for local dev) |
+| `KINDE_POST_LOGOUT_REDIRECT_URL` | ✅ | Where Kinde redirects after logout |
+| `KINDE_POST_LOGIN_REDIRECT_URL` | ✅ | Where Kinde redirects after a successful login |
+| `ANTHROPIC_API_KEY` | ✅ | Anthropic API key — used by the `@ai-sdk/anthropic` provider powering the triage and summary agents |
 | `NEXT_PUBLIC_CONVEX_URL` | ✅ | Convex deployment URL — written automatically by `npx convex dev` |
-| `NEXT_PUBLIC_CONVEX_SITE_URL` | ✅ | Convex HTTP actions URL (e.g. `https://your-deployment.convex.site`) — the base for the Kinde webhook endpoint at `/kinde` |
+| `NEXT_PUBLIC_CONVEX_SITE_URL` | ✅ | Convex HTTP actions base URL (e.g. `https://your-deployment.convex.site`) — the Kinde webhook endpoint is at `${NEXT_PUBLIC_CONVEX_SITE_URL}/kinde` |
 | `CONVEX_DEPLOYMENT` | — | Set automatically by `npx convex deploy` and `npx convex dev`; do not fill in manually |
 | `RESEND_API_KEY` | ⬜ | Resend API key for sending email responses to customers |
-| `NEXT_PUBLIC_URL` | ⬜ | Public URL of this app — used as the base URL for metadata and OG tags (defaults to `http://localhost:3000`) |
 
 ## Submitting tickets
 
@@ -143,7 +148,7 @@ Authorization: Bearer <YOUR_ORG_API_KEY>
 }
 ```
 
-Generate your API key from Dashboard → Settings → API Keys. The key is bound to your organisation — no `orgCode` needed in the request body.
+Generate your API key from Dashboard → Settings → API Keys. The key is bound to your Organization — no `orgCode` needed in the request body.
 
 **MCP server** — for AI agents and agent workflows:
 
@@ -156,7 +161,7 @@ The MCP server exposes three tools:
 | Tool | Description |
 |---|---|
 | `submit_ticket` | Create and triage a new ticket |
-| `get_org_tickets` | List all tickets for an organisation |
+| `get_org_tickets` | List all tickets for an Organization |
 | `get_ticket` | Fetch a single ticket by ID |
 
 **Authentication:** include your API key as `Authorization: Bearer sm_yourkey` on all POST requests to `/api/mcp`. Generate keys from Dashboard → Settings → API Keys.
