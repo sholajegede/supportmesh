@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Code2, LayoutDashboard, Settings, Ticket, Users, Zap } from "lucide-react";
+import { BookOpen, Code2, LayoutDashboard, LogOut, Settings, Ticket, Users, Zap } from "lucide-react";
+import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -83,6 +84,14 @@ export function Sidebar({ givenName, email }: SidebarProps) {
           </p>
           <p className="truncate text-xs text-zinc-500">{email ?? ""}</p>
         </div>
+        <LogoutLink>
+          <button
+            className="ml-auto flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+            title="Sign out"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+          </button>
+        </LogoutLink>
       </div>
     </aside>
   );

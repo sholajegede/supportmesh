@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useQuery, useMutation } from "convex/react";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
-import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { api } from "../../../../convex/_generated/api";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -12,8 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { ArrowRight, Bell, BookOpen, Building2, CheckCircle2, Circle, Code2, LogOut, Paintbrush } from "lucide-react";
+import { ArrowRight, Bell, BookOpen, Building2, CheckCircle2, Circle, Code2, Paintbrush } from "lucide-react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const orgsRef = (api as any).orgs;
@@ -87,7 +85,7 @@ export default function SettingsPage() {
   const slackConfigured = Boolean(orgData?.slackWebhookUrl);
 
   return (
-    <div className="flex flex-col gap-6 p-8 max-w-5xl">
+    <div className="flex flex-col gap-6 p-8">
       {/* ROW 1: Header */}
       <div>
         <h1 className="text-2xl font-semibold text-zinc-900">Settings</h1>
@@ -318,26 +316,6 @@ export default function SettingsPage() {
         </Card>
       </div>
 
-      {/* ROW 5: Separator + Sign out */}
-      <Separator />
-
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-zinc-900">Sign out</p>
-          <p className="text-xs text-zinc-500">
-            You will be redirected to the login page.
-          </p>
-        </div>
-        <LogoutLink>
-          <Button
-            variant="outline"
-            className="gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-          >
-            <LogOut className="h-4 w-4" />
-            Log out
-          </Button>
-        </LogoutLink>
-      </div>
     </div>
   );
 }
