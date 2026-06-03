@@ -9,7 +9,9 @@ import { triageAgent } from "./agents/triage-agent";
 // Creates a fresh McpServer with all tools registered.
 // Must be called per-request in stateless mode to avoid shared state
 // across concurrent Next.js invocations.
-function buildServer(): McpServer {
+// authenticatedOrgCode — when present (API key validated), tools use this
+// orgCode instead of trusting the caller-supplied argument.
+function buildServer(authenticatedOrgCode?: string): McpServer {
   const server = new McpServer({
     name: "SupportMesh MCP",
     version: "1.0.0",
@@ -24,7 +26,8 @@ function buildServer(): McpServer {
       subject:       z.string().describe("Brief subject line"),
       body:          z.string().describe("Full ticket message body"),
     },
-    async ({ orgCode, customerEmail, subject, body }) => {
+    async ({ orgCode: argOrgCode, customerEmail, subject, body }) => {
+      const orgCode = authenticatedOrgCode ?? argOrgCode;
       const result = await triageAgent.generate(
         `Triage this support ticket for org ${orgCode}:
 From: ${customerEmail}
@@ -48,7 +51,8 @@ Message: ${body}`
     {
       orgCode: z.string().describe("Organisation code"),
     },
-    async ({ orgCode }) => {
+    async ({ orgCode: argOrgCode }) => {
+      const orgCode = authenticatedOrgCode ?? argOrgCode;
       const tickets = await fetchQuery(api.tickets.getTicketsByOrg, { orgCode });
       return {
         content: [
@@ -85,8 +89,8 @@ Message: ${body}`
   return server;
 }
 
-export async function handleMcpRequest(req: Request): Promise<Response> {
-  const server = buildServer();
+export async function handleMcpRequest(req: Request, orgCode?: string): Promise<Response> {
+  const server = buildServer(orgCode);
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined, // stateless
   });

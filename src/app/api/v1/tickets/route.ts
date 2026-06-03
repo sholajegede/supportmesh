@@ -2,32 +2,25 @@ import { NextResponse } from "next/server";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
 import { triageAgent } from "@/lib/mastra/agents/triage-agent";
+import { validateApiKeyFromRequest } from "@/lib/api-key";
 
 export const dynamic = "force-dynamic";
 
-function validateApiKey(req: Request): boolean {
-  const configuredKey = process.env.SUPPORTMESH_API_KEY;
-  if (!configuredKey) return true; // demo mode — no key configured
-
-  const authHeader = req.headers.get("authorization") ?? "";
-  const headerKey = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-  const urlKey = new URL(req.url).searchParams.get("apiKey");
-
-  return headerKey === configuredKey || urlKey === configuredKey;
-}
-
 export async function POST(req: Request) {
   try {
-    if (!validateApiKey(req)) {
+    const validation = await validateApiKeyFromRequest(req);
+    if (!validation.valid) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
-    const { orgCode, customerEmail, subject, body: ticketBody } = body;
+    const { customerEmail, subject, body: ticketBody } = body;
+    // orgCode is derived from the API key — never trusted from request body
+    const orgCode = validation.orgCode;
 
-    if (!orgCode || !customerEmail || !subject || !ticketBody) {
+    if (!customerEmail || !subject || !ticketBody) {
       return NextResponse.json(
-        { error: "Missing required fields: orgCode, customerEmail, subject, body" },
+        { error: "Missing required fields: customerEmail, subject, body" },
         { status: 400 }
       );
     }
@@ -48,19 +41,13 @@ Message: ${ticketBody}`
 
 export async function GET(req: Request) {
   try {
-    if (!validateApiKey(req)) {
+    const validation = await validateApiKeyFromRequest(req);
+    if (!validation.valid) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(req.url);
-    const orgCode = searchParams.get("orgCode");
-
-    if (!orgCode) {
-      return NextResponse.json(
-        { error: "Missing required query param: orgCode" },
-        { status: 400 }
-      );
-    }
+    // orgCode is derived from the API key — never trusted from query params
+    const orgCode = validation.orgCode;
 
     const tickets = await fetchQuery(api.tickets.getTicketsByOrg, { orgCode });
     return NextResponse.json({ tickets });

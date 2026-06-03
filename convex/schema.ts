@@ -44,4 +44,13 @@ export default defineSchema({
     firstName: v.string(),
     lastName: v.string(),
   }).index("by_kindeId", ["kindeId"]),
+
+  apiKeys: defineTable({
+    orgCode: v.string(),
+    keyHash: v.string(),
+    label: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_orgCode", ["orgCode"])
+    .index("by_keyHash", ["keyHash"]),
 });
