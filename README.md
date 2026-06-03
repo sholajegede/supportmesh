@@ -85,17 +85,21 @@ To generate a key: log into the dashboard, go to Settings → API Keys, click **
    npx convex dev
    ```
 
-   This opens a browser to create or link a Convex project and writes `NEXT_PUBLIC_CONVEX_URL` into your `.env.local` automatically.
+   This opens a browser to create or link a Convex project and writes `NEXT_PUBLIC_CONVEX_URL` into your `.env.local` automatically. Once the deployment is created, also set `NEXT_PUBLIC_CONVEX_SITE_URL` to your Convex HTTP actions base URL — it has the same deployment name but uses the `.convex.site` domain:
+
+   ```
+   NEXT_PUBLIC_CONVEX_SITE_URL=https://<your-deployment>.convex.site
+   ```
 
 5. **Configure the Kinde webhook**
 
-   In your Kinde dashboard, add a webhook pointing to your Convex HTTP actions endpoint. The base URL is your `NEXT_PUBLIC_CONVEX_SITE_URL`:
+   In your Kinde dashboard, add a webhook pointing to:
 
    ```
    https://<your-deployment>.convex.site/kinde
    ```
 
-   This keeps user records in sync between Kinde and Convex.
+   This is `NEXT_PUBLIC_CONVEX_SITE_URL` + `/kinde`. It keeps user records in sync between Kinde and Convex.
 
 6. **Start the Next.js dev server**
 
