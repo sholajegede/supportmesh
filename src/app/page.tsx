@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { Button } from "@/components/ui/button";
@@ -407,6 +408,7 @@ export default function HomePage() {
                   desc: "The triage agent, summary agent, and MCP server are all built on Mastra. It manages the tool loop, handles retries, and keeps the agent context clean.",
                   href: "https://mastra.ai",
                   linkLabel: "mastra.ai",
+                  imgSrc: "/mastra-logo.png",
                 },
                 {
                   name: "Kinde",
@@ -414,6 +416,7 @@ export default function HomePage() {
                   desc: "Every organisation is isolated via a JWT org_code claim. No organisation ever sees another's data. Authentication, user management, and tenant isolation in one SDK.",
                   href: "https://kinde.com",
                   linkLabel: "kinde.com",
+                  imgSrc: "/kinde-logo.png",
                 },
                 {
                   name: "Convex",
@@ -421,16 +424,15 @@ export default function HomePage() {
                   desc: "Tickets appear in your dashboard the moment the agent processes them. Convex's reactive queries mean no polling, no refresh, and server-side identity verification on every query.",
                   href: "https://convex.dev",
                   linkLabel: "convex.dev",
+                  imgSrc: "/convex-logo.png",
                 },
-              ].map(({ name, role, desc, href, linkLabel }) => (
+              ].map(({ name, role, desc, href, linkLabel, imgSrc }) => (
                 <div
                   key={name}
                   className="flex flex-col gap-4 rounded-xl border border-zinc-100 bg-zinc-50 p-6"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center">
-                      <span className="text-xs text-zinc-400 font-mono">logo</span>
-                    </div>
+                    <Image src={imgSrc} alt={name} width={40} height={40} className="rounded-xl" />
                     <div>
                       <p className="text-sm font-semibold text-zinc-900">{name}</p>
                       <p className="text-xs text-zinc-500">{role}</p>
