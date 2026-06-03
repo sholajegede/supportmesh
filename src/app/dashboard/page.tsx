@@ -128,9 +128,9 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="flex flex-col gap-8 p-8">
+      <div className="flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-zinc-900">
               {greeting()}, {user?.given_name ?? "there"} 👋
@@ -154,7 +154,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stat cards */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {STATS.map(({ label, value, icon: Icon, color, accent }) => (
             <Card key={label} className={`shadow-none border-l-2 ${accent}`}>
               <CardHeader className="flex flex-row items-center justify-between pb-2 pt-5">
@@ -179,6 +179,8 @@ export default function DashboardPage() {
               Recent Tickets
             </CardTitle>
           </CardHeader>
+          <div className="overflow-x-auto -mx-px sm:mx-0">
+            <div className="min-w-[600px] sm:min-w-0">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
@@ -244,6 +246,8 @@ export default function DashboardPage() {
               )}
             </TableBody>
           </Table>
+            </div>
+          </div>
         </Card>
         <div className="flex justify-end">
           <Link

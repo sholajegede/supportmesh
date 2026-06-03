@@ -62,7 +62,7 @@ export default function CustomersPage() {
     : [];
 
   return (
-    <div className="flex flex-col gap-6 p-8">
+    <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="flex items-center gap-3">
         <h1 className="text-2xl font-semibold text-zinc-900">Customers</h1>
@@ -77,6 +77,8 @@ export default function CustomersPage() {
 
       {/* Table */}
       <Card className="shadow-none">
+        <div className="overflow-x-auto -mx-px sm:mx-0">
+          <div className="min-w-[400px] sm:min-w-0">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -132,6 +134,8 @@ export default function CustomersPage() {
             )}
           </TableBody>
         </Table>
+          </div>
+        </div>
       </Card>
     </div>
   );

@@ -129,7 +129,7 @@ export default function DeveloperPage() {
 
   return (
     <>
-      <div className="flex flex-col gap-8 p-8">
+      <div className="flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
         {/* Header */}
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900">Developer</h1>
@@ -138,7 +138,7 @@ export default function DeveloperPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Row 1: Customer Submission URL (left) + API Keys (right) */}
 
           {/* ── Customer Submission URL ── */}

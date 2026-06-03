@@ -85,7 +85,7 @@ export default function SettingsPage() {
   const slackConfigured = Boolean(orgData?.slackWebhookUrl);
 
   return (
-    <div className="flex flex-col gap-6 p-8">
+    <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
       {/* ROW 1: Header */}
       <div>
         <h1 className="text-2xl font-semibold text-zinc-900">Settings</h1>
@@ -145,7 +145,7 @@ export default function SettingsPage() {
       </Card>
 
       {/* ROW 3: Slack + Branding — two columns */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Slack card */}
         <Card className="shadow-none">
           <CardHeader className="border-b px-6 py-4">
@@ -208,7 +208,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="px-6 py-5">
             <form onSubmit={handleSaveBranding} className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="brand-name" className="text-sm font-medium text-zinc-700">
                     Brand name
@@ -270,7 +270,7 @@ export default function SettingsPage() {
       </div>
 
       {/* ROW 4: Knowledge Base + Developer — two columns */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card className="shadow-none">
           <CardHeader className="border-b px-6 py-4">
             <CardTitle className="flex items-center gap-2 text-base font-semibold text-zinc-900">

@@ -161,14 +161,14 @@ export default function TicketDetailPage() {
   // ── Loading ────────────────────────────────────────────────────────────────
   if (ticket === undefined) {
     return (
-      <div className="flex flex-col gap-6 p-8">
+      <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
         {BACK}
         <div className="flex flex-col gap-2">
           <Skeleton className="h-7 w-2/3" />
           <Skeleton className="h-4 w-48" />
         </div>
-        <div className="grid grid-cols-5 gap-6">
-          <div className="col-span-3 flex flex-col gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="col-span-1 lg:col-span-3 flex flex-col gap-5">
             <Card className="shadow-none">
               <CardHeader className="border-b px-5 py-4">
                 <Skeleton className="h-4 w-32" />
@@ -190,7 +190,7 @@ export default function TicketDetailPage() {
               </CardContent>
             </Card>
           </div>
-          <div className="col-span-2 flex flex-col gap-5">
+          <div className="col-span-1 lg:col-span-2 flex flex-col gap-5">
             <Card className="shadow-none">
               <CardHeader className="border-b px-5 py-4">
                 <Skeleton className="h-4 w-28" />
@@ -213,7 +213,7 @@ export default function TicketDetailPage() {
   // ── Not found ──────────────────────────────────────────────────────────────
   if (ticket === null) {
     return (
-      <div className="flex flex-col gap-6 p-8">
+      <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
         {BACK}
         <div className="flex flex-col items-center justify-center py-24 gap-3">
           <p className="text-lg font-medium text-zinc-800">Ticket not found</p>

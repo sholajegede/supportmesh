@@ -117,9 +117,9 @@ export default function TicketsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-8">
+    <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-semibold text-zinc-900">Tickets</h1>
           {isLoading ? (
@@ -210,6 +210,7 @@ export default function TicketsPage() {
 
       {/* Filter tabs */}
       <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)}>
+        <div className="overflow-x-auto">
         <TabsList className="h-9">
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="open">Open</TabsTrigger>
@@ -217,10 +218,13 @@ export default function TicketsPage() {
           <TabsTrigger value="escalated">Escalated</TabsTrigger>
           <TabsTrigger value="resolved">Resolved</TabsTrigger>
         </TabsList>
+        </div>
       </Tabs>
 
       {/* Table */}
       <Card className="shadow-none">
+        <div className="overflow-x-auto -mx-px sm:mx-0">
+          <div className="min-w-[600px] sm:min-w-0">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -305,6 +309,8 @@ export default function TicketsPage() {
             )}
           </TableBody>
         </Table>
+          </div>
+        </div>
       </Card>
     </div>
   );
